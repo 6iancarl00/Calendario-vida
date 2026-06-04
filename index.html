@@ -87,15 +87,41 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 .mact.primary:hover{opacity:.88;}
 
 /* ── NEW ATHLETE MODAL ── */
-.new-ath-form{display:flex;flex-direction:column;gap:14px;padding:20px 24px;}
+.new-ath-form{display:flex;flex-direction:column;gap:13px;padding:20px 24px;}
 .form-group label{font-size:.65rem;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--soft);display:block;margin-bottom:5px;}
 .form-input{width:100%;padding:10px 12px;border:1.5px solid var(--bege);border-radius:8px;font-family:'Jost',sans-serif;font-size:.82rem;color:var(--text);background:var(--perola);outline:none;transition:border-color .15s;}
 .form-input:focus{border-color:var(--terra);background:white;}
 .form-select{width:100%;padding:10px 12px;border:1.5px solid var(--bege);border-radius:8px;font-family:'Jost',sans-serif;font-size:.82rem;color:var(--text);background:var(--perola);outline:none;cursor:pointer;}
+.form-textarea{width:100%;padding:9px 11px;border:1.5px solid var(--bege);border-radius:8px;font-family:'Jost',sans-serif;font-size:.78rem;color:var(--text);background:var(--perola);outline:none;resize:vertical;min-height:54px;transition:border-color .15s;line-height:1.5;}
+.form-textarea:focus{border-color:var(--terra);background:white;}
+.form-textarea::placeholder{color:var(--soft);}
+.form-row{display:grid;gap:9px;}
+.form-row.tri{grid-template-columns:repeat(3,1fr);}
+.inp-wrap{display:flex;align-items:stretch;}
+.inp-wrap .form-input{border-radius:8px 0 0 8px;flex:1;min-width:0;width:0;}
+.inp-suf{padding:0 8px;border:1.5px solid var(--bege);border-left:none;border-radius:0 8px 8px 0;font-size:.68rem;color:var(--soft);background:var(--perola-dark);display:flex;align-items:center;white-space:nowrap;}
 .hab-selector{display:flex;flex-wrap:wrap;gap:7px;}
 .hab-chip{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1.5px solid var(--bege);background:white;font-size:.72rem;color:var(--mid);cursor:pointer;transition:all .15s;user-select:none;}
 .hab-chip:hover{border-color:var(--terra);}
 .hab-chip.sel{border-color:var(--terra);background:var(--perola);color:var(--terra);font-weight:600;}
+.hab-chip.custom{background:rgba(151,67,21,.07);border-color:rgba(151,67,21,.2);}
+.hab-chip.custom.sel{background:var(--perola);border-color:var(--terra);color:var(--terra);}
+.toggle-cust{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;border:1.5px dashed var(--perola-dark);background:transparent;color:var(--soft);font-size:.7rem;font-family:'Jost',sans-serif;cursor:pointer;transition:all .15s;margin-top:5px;}
+.toggle-cust:hover{border-color:var(--terra);color:var(--terra);}
+.cust-hab-panel{background:var(--perola);border-radius:10px;padding:13px;margin-top:7px;display:none;flex-direction:column;gap:9px;}
+.cust-hab-panel.open{display:flex;}
+.emoji-grd{display:flex;flex-wrap:wrap;gap:4px;}
+.em-b{width:30px;height:30px;border-radius:6px;border:1.5px solid var(--bege);background:white;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .13s;flex-shrink:0;}
+.em-b:hover{border-color:var(--terra);transform:scale(1.08);}
+.em-b.sel{border-color:var(--terra);background:var(--perola);box-shadow:0 0 0 2px rgba(151,67,21,.18);}
+.cust-fields{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;}
+.cust-name{flex:1;min-width:110px;padding:8px 10px;border:1.5px solid var(--bege);border-radius:8px;font-family:'Jost',sans-serif;font-size:.78rem;color:var(--text);background:white;outline:none;}
+.cust-name:focus{border-color:var(--terra);}
+.cust-type{padding:8px 9px;border:1.5px solid var(--bege);border-radius:8px;font-family:'Jost',sans-serif;font-size:.75rem;color:var(--text);background:white;outline:none;}
+.cust-goal{width:50px;padding:8px 6px;border:1.5px solid var(--bege);border-radius:8px;font-family:'Jost',sans-serif;font-size:.78rem;text-align:center;color:var(--text);background:white;outline:none;}
+.cust-add-btn{padding:8px 14px;background:var(--terra);color:white;border:none;border-radius:7px;font-size:.72rem;font-family:'Jost',sans-serif;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:opacity .15s;}
+.cust-add-btn:hover{opacity:.88;}
+.na-section-hdr{font-family:'Cormorant Garamond',serif;font-size:.9rem;color:var(--terra);font-weight:600;letter-spacing:.3px;border-bottom:1px solid var(--bege);padding-bottom:5px;margin-top:2px;}
 .link-box{background:var(--perola);border:1.5px solid var(--bege);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-top:4px;}
 .link-url{font-size:.72rem;color:var(--mid);flex:1;word-break:break-all;}
 .copy-btn{background:var(--terra);color:white;border:none;border-radius:6px;padding:6px 12px;font-size:.68rem;font-family:'Jost',sans-serif;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
@@ -576,10 +602,13 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
   <div class="modal">
     <div class="modal-head">
       <div class="modal-av">➕</div>
-      <div><div class="modal-name">Nuevo atleta</div><div class="modal-sub">Configura su perfil y hábitos</div></div>
+      <div><div class="modal-name">Nuevo atleta</div><div class="modal-sub">Perfil completo y hábitos</div></div>
       <button class="modal-x" onclick="closeNewAth()">✕</button>
     </div>
     <div class="new-ath-form" id="new-ath-form">
+
+      <div class="na-section-hdr">Perfil del atleta</div>
+
       <div class="form-group">
         <label>Nombre completo</label>
         <input class="form-input" id="na-name" placeholder="Ej: Laura Martínez" type="text">
@@ -594,10 +623,47 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
           <option>Bienestar</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Hábitos a trackear</label>
-        <div class="hab-selector" id="hab-selector"></div>
+      <div class="form-row tri">
+        <div class="form-group" style="margin:0">
+          <label>Edad</label>
+          <div class="inp-wrap"><input class="form-input" id="na-age" type="number" min="10" max="80" placeholder="—"><div class="inp-suf">años</div></div>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Peso</label>
+          <div class="inp-wrap"><input class="form-input" id="na-weight" type="number" min="30" max="300" step="0.1" placeholder="—"><div class="inp-suf">kg</div></div>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Altura</label>
+          <div class="inp-wrap"><input class="form-input" id="na-height" type="number" min="100" max="250" placeholder="—"><div class="inp-suf">cm</div></div>
+        </div>
       </div>
+      <div class="form-group">
+        <label>Notas privadas del entrenador</label>
+        <textarea class="form-textarea" id="na-notes" placeholder="Lesiones, objetivos específicos, observaciones..." rows="2"></textarea>
+      </div>
+
+      <div class="na-section-hdr">Hábitos a trackear</div>
+
+      <div class="form-group" style="margin-top:0">
+        <label>Selecciona los hábitos</label>
+        <div class="hab-selector" id="hab-selector"></div>
+        <button class="toggle-cust" onclick="toggleCustHabForm()">＋ Hábito personalizado</button>
+        <div class="cust-hab-panel" id="cust-hab-panel">
+          <div style="font-size:.62rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--soft);">Elige un icono</div>
+          <div class="emoji-grd" id="emoji-grd"></div>
+          <div class="cust-fields">
+            <input class="cust-name" id="cust-name" type="text" placeholder="Nombre del hábito">
+            <select class="cust-type" id="cust-type" onchange="updCustGoalVis()">
+              <option value="check">✓ Check</option>
+              <option value="water">💧 Vasos</option>
+              <option value="scale">⭐ Escala 1-5</option>
+            </select>
+            <input class="cust-goal" id="cust-goal" type="number" min="1" max="20" value="1" placeholder="Meta">
+            <button class="cust-add-btn" onclick="addCustomHabit()">Añadir</button>
+          </div>
+        </div>
+      </div>
+
       <div class="modal-actions">
         <button class="mact" onclick="closeNewAth()">Cancelar</button>
         <button class="mact primary" onclick="createAthlete()">Crear atleta →</button>
@@ -991,7 +1057,12 @@ function renderSBCoach(){
 // ══════════════════════════════════════
 // SCREEN ROUTER
 // ══════════════════════════════════════
-function showScreen(s){document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));document.getElementById('screen-'+s).classList.add('active');}
+function showScreen(s){
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  document.getElementById('screen-'+s).classList.add('active');
+  const nav=document.getElementById('mobile-nav');
+  if(nav)nav.style.display=s==='coach'?'none':'';
+}
 
 // ══════════════════════════════════════
 // COACH — load athletes from DB
@@ -1166,47 +1237,96 @@ async function exitAthView(){
 // NEW ATHLETE MODAL
 // ══════════════════════════════════════
 let selectedHabits=new Set(['agua','nutri','entr']);
+let customHabitDefs=[];
+let custPickedEmoji='🎯';
+const CUST_EMOJIS=['🏃','🚴','🧘','💪','🥗','🥤','💊','😴','📚','🙏','⚽','🏊','🎯','🧠','❤️','🌿','🔥','⏱️','🎵','✍️'];
+
 function openNewAth(){
   document.getElementById('new-ath-form').style.display='flex';
   document.getElementById('new-ath-result').style.display='none';
-  document.getElementById('na-name').value='';
-  // render habit chips
-  const sel=document.getElementById('hab-selector');
-  sel.innerHTML=ALL_HABITS.map(h=>`<div class="hab-chip ${selectedHabits.has(h.id)?'sel':''}" onclick="togHabChip(this,'${h.id}')">${h.icon} ${h.name}</div>`).join('');
+  ['na-name','na-age','na-weight','na-height','na-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  customHabitDefs=[];
+  custPickedEmoji='🎯';
+  const panel=document.getElementById('cust-hab-panel');
+  if(panel)panel.classList.remove('open');
+  const egrd=document.getElementById('emoji-grd');
+  if(egrd)egrd.innerHTML=CUST_EMOJIS.map(e=>`<div class="em-b${e===custPickedEmoji?' sel':''}" onclick="togEmoji(this,'${e}')">${e}</div>`).join('');
+  renderHabChips();
   document.getElementById('new-ath-modal').classList.add('open');
 }
 function closeNewAth(){document.getElementById('new-ath-modal').classList.remove('open');}
 document.getElementById('new-ath-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeNewAth();});
-function togHabChip(el,id){el.classList.toggle('sel');if(el.classList.contains('sel'))selectedHabits.add(id);else selectedHabits.delete(id);}
+function togHabChip(el,id){
+  el.classList.toggle('sel');
+  if(!id.startsWith('custom_')){
+    if(el.classList.contains('sel'))selectedHabits.add(id);
+    else selectedHabits.delete(id);
+  }
+}
+function renderHabChips(){
+  const sel=document.getElementById('hab-selector');
+  if(!sel)return;
+  const stdChips=ALL_HABITS.map(h=>`<div class="hab-chip ${selectedHabits.has(h.id)?'sel':''}" onclick="togHabChip(this,'${h.id}')">${h.icon} ${h.name}</div>`);
+  const custChips=customHabitDefs.map((h,i)=>`<div class="hab-chip custom sel" onclick="togHabChip(this,'custom_${i}')">${h.icon} ${h.name}</div>`);
+  sel.innerHTML=[...stdChips,...custChips].join('');
+}
+function togEmoji(el,emoji){
+  document.querySelectorAll('.em-b').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');custPickedEmoji=emoji;
+}
+function toggleCustHabForm(){
+  const p=document.getElementById('cust-hab-panel');
+  if(p)p.classList.toggle('open');
+}
+function updCustGoalVis(){
+  const t=document.getElementById('cust-type').value;
+  const g=document.getElementById('cust-goal');
+  if(g)g.style.display=t==='scale'?'none':'';
+}
+function addCustomHabit(){
+  const name=(document.getElementById('cust-name').value||'').trim();
+  if(!name){toast('Escribe el nombre del hábito');return;}
+  const type=document.getElementById('cust-type').value;
+  const goal=parseInt(document.getElementById('cust-goal').value)||1;
+  const colors=['#974315','#788990','#8D957E','#b0795a','#6b8c6b','#c4956a'];
+  const color=colors[customHabitDefs.length%colors.length];
+  customHabitDefs.push({icon:custPickedEmoji,name,type,goal,color});
+  document.getElementById('cust-name').value='';
+  renderHabChips();
+  toast(`"${name}" añadido`);
+}
 
 async function createAthlete(){
   const name=document.getElementById('na-name').value.trim();
   if(!name){toast('Escribe el nombre del atleta');return;}
   const tag=document.getElementById('na-tag').value;
+  const age=parseInt(document.getElementById('na-age').value)||null;
+  const weight=parseFloat(document.getElementById('na-weight').value)||null;
+  const height=parseFloat(document.getElementById('na-height').value)||null;
+  const coachNotes=(document.getElementById('na-notes').value||'').trim();
+  const profile=JSON.stringify({age,weight,height});
   const token=genToken();
   const colors=['#974315','#788990','#8D957E','#b0795a','#6b8c6b','#c4956a'];
   const color=colors[Math.floor(Math.random()*colors.length)];
 
-  try{
-    // 1. Create athlete
-    const [ath]=await sb.post('athletes',{name,tag,token,coach_id:'coach1',color});
-    // 2. Create habits
-    const habsToCreate=[...selectedHabits].map((hid,i)=>{
-      const h=ALL_HABITS.find(x=>x.id===hid);
-      return {athlete_id:ath.id,name:h.name,icon:h.icon,color:h.color,type:h.type,goal:h.goal||1,position:i};
-    });
-    if(habsToCreate.length) await sb.post('habits',habsToCreate);
+  // Build habits: standard selected + all custom
+  const stdHabs=[...selectedHabits].map((hid,i)=>{
+    const h=ALL_HABITS.find(x=>x.id===hid);
+    return h?{name:h.name,icon:h.icon,color:h.color,type:h.type,goal:h.goal||1,position:i}:null;
+  }).filter(Boolean);
+  const custHabs=customHabitDefs.map((h,i)=>({name:h.name,icon:h.icon,color:h.color,type:h.type==='scale'?'check':h.type,goal:h.goal||1,position:stdHabs.length+i}));
+  const allHabs=[...stdHabs,...custHabs];
 
-    // Show link
+  try{
+    const [ath]=await sb.post('athletes',{name,tag,token,coach_id:'coach1',color,profile,coach_notes:coachNotes});
+    if(allHabs.length) await sb.post('habits',allHabs.map(h=>({...h,athlete_id:ath.id})));
     const link=`${BASE_URL}?a=${token}`;
     document.getElementById('nar-name').textContent=name;
     document.getElementById('nar-link').textContent=link;
     document.getElementById('new-ath-form').style.display='none';
     document.getElementById('new-ath-result').style.display='block';
-    // Reload athletes
     await loadAndRenderCoach();
   }catch(e){
-    // Demo fallback
     const link=`${BASE_URL}?a=${token}`;
     document.getElementById('nar-name').textContent=name;
     document.getElementById('nar-link').textContent=link;
@@ -1674,14 +1794,6 @@ function mobileNav(v){
   if(el) el.classList.add('active');
   showScreen('cal');
   showCal(v);
-}
-
-// Hide mobile nav when in coach panel
-const _origShowScreen = showScreen;
-function showScreen(s){
-  _origShowScreen(s);
-  const nav=document.getElementById('mobile-nav');
-  if(nav) nav.style.display = s==='coach' ? 'none' : '';
 }
 
 init();

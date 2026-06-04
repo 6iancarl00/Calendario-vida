@@ -128,7 +128,8 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 .copy-btn:hover{opacity:.85;}
 
 /* ── APP SHELL ── */
-#app{display:grid;grid-template-columns:216px 1fr;grid-template-rows:auto 1fr;min-height:100vh;}
+#app{display:grid;grid-template-columns:216px 1fr;grid-template-rows:auto 1fr;min-height:100vh;opacity:0;animation:fadeIn .3s .2s forwards;}
+@keyframes fadeIn{to{opacity:1;}}
 .sidebar{grid-row:1/3;background:var(--terra);display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;}
 .sb-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.1);cursor:pointer;}
 .logo-t{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:300;letter-spacing:2px;color:var(--perola);text-transform:uppercase;}
@@ -152,7 +153,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 .u-role{font-size:.58rem;color:rgba(240,237,228,.38);margin-top:1px;}
 
 /* ── TOPBAR ── */
-.topbar{background:white;border-bottom:1px solid var(--perola-dark);padding:0 26px;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.topbar{background:white;border-bottom:1px solid var(--perola-dark);padding:0 26px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:inset 0 -2px 0 rgba(151,67,21,.08);}
 .tb-left{display:flex;align-items:center;gap:11px;}
 .tb-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--terra);}
 .coach-badge{font-size:.58rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:var(--terra);color:white;border-radius:20px;padding:3px 9px;display:none;}
@@ -161,7 +162,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 .tb-date{font-size:.67rem;letter-spacing:1px;color:var(--soft);text-transform:uppercase;}
 .tb-btn{display:flex;align-items:center;gap:5px;background:var(--terra);color:white;border:none;border-radius:8px;padding:7px 13px;font-family:'Jost',sans-serif;font-size:.7rem;font-weight:500;cursor:pointer;transition:opacity .15s;}
 .tb-btn:hover{opacity:.88;}
-.view-banner{background:var(--azul);padding:7px 26px;display:none;align-items:center;gap:11px;font-size:.72rem;color:white;}
+.view-banner{background:#c4783a;padding:7px 26px;display:none;align-items:center;gap:11px;font-size:.72rem;color:white;}
 .view-banner.on{display:flex;}
 .vb-name{font-weight:600;}
 .vb-back{margin-left:auto;background:rgba(255,255,255,.2);border:none;color:white;border-radius:6px;padding:4px 11px;font-size:.66rem;cursor:pointer;font-family:'Jost',sans-serif;}
@@ -313,8 +314,8 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 .sl-ic{font-size:.9rem;width:22px;text-align:center;}
 .sl-info{flex:1;}
 .sl-lbl{font-size:.76rem;font-weight:500;color:var(--mid);margin-bottom:4px;}
-.sl-slider{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--bege);outline:none;cursor:pointer;}
-.sl-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--terra);cursor:pointer;}
+.sl-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--bege);outline:none;cursor:pointer;}
+.sl-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--terra);cursor:pointer;}
 .sl-val{font-size:.68rem;color:var(--terra);font-weight:600;margin-top:3px;}
 .chart-c{width:100%;border-radius:4px;}
 .chart-leg{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
@@ -397,6 +398,24 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 .coach-hint:hover{background:rgba(151,67,21,.2);}
 .coach-hint.hidden{display:none;}
 
+/* Monthly event pills */
+.ev-pill{display:block;background:rgba(151,67,21,.08);border-left:3px solid var(--terra);border-radius:4px;padding:2px 5px;font-size:.58rem;font-weight:500;color:var(--terra);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
+.ev-pill-more{font-size:.52rem;color:var(--soft);margin-top:2px;padding-left:4px;display:block;}
+.mo-cell.has-ev{min-height:90px;}
+
+/* Mobile quick stats strip (hidden on desktop) */
+.day-quick-strip{display:none;overflow-x:auto;-webkit-overflow-scrolling:touch;background:white;border-radius:var(--r);padding:10px 14px;box-shadow:var(--shadow);align-items:center;gap:0;white-space:nowrap;}
+.qs-block{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;}
+.qs-sep{display:inline-block;width:1px;height:22px;background:var(--bege);margin:0 12px;vertical-align:middle;flex-shrink:0;}
+.qs-ic{font-size:.95rem;line-height:1;}
+.qs-num{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:var(--terra);line-height:1;}
+.qs-lbl{font-size:.58rem;color:var(--soft);}
+.qs-mood-btn{font-size:1.1rem;padding:2px 4px;border-radius:6px;cursor:pointer;border:1.5px solid transparent;transition:all .12s;flex-shrink:0;}
+.qs-mood-btn.sel{border-color:var(--terra);background:var(--perola);}
+.qs-sl{-webkit-appearance:none;appearance:none;width:80px;height:4px;border-radius:2px;background:var(--bege);outline:none;cursor:pointer;flex-shrink:0;}
+.qs-sl::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:13px;height:13px;border-radius:50%;background:var(--terra);cursor:pointer;}
+.qs-sl-val{font-size:.68rem;color:var(--terra);font-weight:600;}
+
 @media(max-width:820px){
   #app{grid-template-columns:1fr;}
   .sidebar{display:none;}
@@ -417,39 +436,47 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
   .cal-tab{padding:10px 12px;font-size:.6rem;white-space:nowrap;flex-shrink:0;}
   .cal-yr{display:none;}
 
-  /* Day view */
-  .day-big{font-size:2rem;}
-  .day-side{display:none;} /* hide sidebar on mobile day view */
-  .card{padding:14px 15px;}
-  .card-t{font-size:.88rem;margin-bottom:10px;}
+  /* Day view — mobile redesign */
+  .day-big{font-size:1.8rem;}
+  .nav-btn{width:28px;height:28px;font-size:.8rem;}
+  .day-side{display:none;}
+  .day-quick-strip{display:flex;}
+  .card{padding:12px 12px;}
+  .card-t{font-size:.88rem;margin-bottom:9px;}
 
-  /* Habits — make sure checks are visible */
-  .hab-row{gap:8px;}
-  .h-name{font-size:.74rem;}
-  .h-check{width:26px;height:26px;flex-shrink:0;}
-  .water-row{flex-wrap:wrap;gap:6px;}
-  .water-gs{gap:4px;}
+  /* Intención — compact */
+  .int-area{min-height:38px;}
+
+  /* Habits — single-line rows, 26px touch targets */
+  .hab-row{gap:7px;flex-wrap:nowrap;}
+  .h-ic{width:20px;font-size:.85rem;}
+  .h-name{font-size:.75rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .h-track{flex-shrink:0;}
+  .h-check{width:26px;height:26px;min-width:26px;flex-shrink:0;}
+  .water-row{flex-wrap:wrap;gap:5px;}
+  .water-gs{display:flex;flex-wrap:wrap;gap:4px;max-width:none;}
   .water-g{width:24px;height:24px;}
 
-  /* Week strip */
-  .wk-strip{gap:2px;}
-  .ws-b{padding:5px 1px;}
-  .ws-num{font-size:.75rem;}
-
-  /* Mood */
-  .mood-b{font-size:.88rem;padding:5px 2px;}
-  .mood-l{font-size:.5rem;}
+  /* Notes — 3 rows */
+  .notes-area{min-height:unset;}
 
   /* Monthly */
   .mo-cell{min-height:44px;padding:4px 3px;}
   .cell-n{font-size:.68rem;width:18px;height:18px;}
+  .mo-cell.has-ev{min-height:72px;}
+  .ev-pill{font-size:.5rem;padding:1px 3px;}
+
+  /* Weekly */
+  .wk-strip{gap:2px;}
+  .ws-b{padding:5px 1px;}
+  .ws-num{font-size:.75rem;}
 
   /* Coach panel mobile */
   .ath-card{grid-template-columns:auto 1fr;}
   .a-stats{display:none;}
   .vcal-btn{opacity:1;position:static;transform:none;margin-top:6px;font-size:.6rem;}
 
-  /* Bottom nav for mobile */
+  /* Mobile nav */
   .mobile-nav{display:flex !important;}
 }
 
@@ -781,7 +808,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
       </div>
       <div class="tb-right">
         <div class="tb-date" id="tb-date">—</div>
-        <button class="tb-btn" id="tb-btn" onclick="tbAct()">📋 Hoy</button>
+        <button class="tb-btn" id="tb-btn" onclick="tbAct()">Hoy</button>
       </div>
     </div>
     <div class="view-banner" id="vbanner">
@@ -820,6 +847,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
           <div class="day-layout">
             <div class="day-main">
               <div><div class="day-dr"><div><div class="day-big" id="d-date">—</div><div class="day-wd" id="d-wd">—</div></div><div class="nav-row"><button class="nav-btn" onclick="chgDay(-1)">‹</button><button class="today-btn" onclick="goToday()">Hoy</button><button class="nav-btn" onclick="chgDay(1)">›</button></div></div></div>
+              <div class="day-quick-strip" id="day-quick-strip"></div>
               <div id="day-events-card" style="display:none"></div>
               <div class="card"><div class="card-t">✦ Intención del día</div><textarea class="int-area" id="intention" placeholder="¿Con qué intención quieres vivir este día?..." rows="2" onblur="saveNote()"></textarea></div>
               <div class="card"><div class="card-t">Objetivos de hoy</div><div id="habs-cont"></div></div>
@@ -854,21 +882,11 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 
 <!-- Mobile bottom navigation -->
 <nav class="mobile-nav" id="mobile-nav">
-  <div class="mn-item active" id="mn-day" onclick="mobileNav('day')">
-    <span class="mn-ic">📅</span>Hoy
-  </div>
-  <div class="mn-item" id="mn-monthly" onclick="mobileNav('monthly')">
-    <span class="mn-ic">📆</span>Mensual
-  </div>
-  <div class="mn-item" id="mn-weekly" onclick="mobileNav('weekly')">
-    <span class="mn-ic">🗓</span>Semanal
-  </div>
-  <div class="mn-item" id="mn-annual" onclick="mobileNav('annual')">
-    <span class="mn-ic">🗂</span>Anual
-  </div>
-  <div class="mn-item" id="mn-coach" onclick="mobileNav('coach')" style="display:none">
-    <span class="mn-ic">🏋️</span>Panel
-  </div>
+  <div class="mn-item active" id="mn-day" onclick="mobileNav('day')">HOY</div>
+  <div class="mn-item" id="mn-monthly" onclick="mobileNav('monthly')">MES</div>
+  <div class="mn-item" id="mn-weekly" onclick="mobileNav('weekly')">SEM</div>
+  <div class="mn-item" id="mn-annual" onclick="mobileNav('annual')">AÑO</div>
+  <div class="mn-item" id="mn-coach" onclick="mobileNav('coach')" style="display:none">PANEL</div>
 </nav>
 
 <script>
@@ -1094,7 +1112,7 @@ function renderAthleteMode(){
   document.getElementById('sb-name').textContent=curAthlete?curAthlete.name:'Tu nombre';
   document.getElementById('sb-role').textContent='Atleta';
   document.getElementById('tb-title').innerHTML='Mi <em style="font-style:italic;color:var(--azul)">Calendario</em>';
-  document.getElementById('tb-btn').textContent='📋 Hoy';
+  document.getElementById('tb-btn').textContent='Hoy';
   document.getElementById('vbanner').classList.remove('on');
   document.getElementById('vp').style.display='none';
   renderSBAth();
@@ -1230,7 +1248,7 @@ function renderAthCards(){
     const circ=2*Math.PI*15,off=circ-(av/100)*circ;
     const inits=a.initials||(a.name.split(' ').map(w=>w[0]).join('').slice(0,2));
     const col=a.color||'#974315';
-    const dots=Array.from({length:7},(_,i)=>{const done=a._wd&&a._wd.some(h=>h.days[i]);return `<div class="a-dd"><div class="a-dot" style="background:${done?rc:'var(--perola-dark)'}"></div><div class="a-dl">${DFULL[(i+1)%7].slice(0,1)}</div></div>`;}).join('');
+    const dots=Array.from({length:7},(_,i)=>{const d=new Date(TODAY);d.setDate(TODAY.getDate()-6+i);const done=a._wd&&a._wd.some(h=>h.days[i]);return `<div class="a-dd"><div class="a-dot" style="background:${done?rc:'var(--perola-dark)'}"></div><div class="a-dl">${DFULL[d.getDay()].slice(0,1)}</div></div>`;}).join('');
     const lastTxt=last===0?'Hoy':last===1?'Ayer':`Hace ${last}d`;
     const lastCls=last<=1?'ok':last<=3?'warn':'bad';
     const el=document.createElement('div');el.className=`ath-card ${status}`;
@@ -1548,8 +1566,16 @@ function renderMonthly(){
     if(hasData&&habs.length){tint=pctDay>0.7?' tint-good':pctDay<0.4?' tint-low':'';}
     el.className='mo-cell'+(isT?' tod-c':'')+tint;
     const dots=habs.filter(h=>getLogVal(k,h.id)>0).map(h=>`<div class="cell-dot" style="background:${h.color}"></div>`).join('');
-    const evDots=athEvents.filter(e=>e.date===k).map(e=>{const t=getEvType(e.type);return `<div class="cell-dot" style="background:${t.color};border-radius:2px;width:5px;height:5px;"></div>`;}).join('');
-    el.innerHTML=`<div class="cell-n">${d}</div><div class="cell-dots">${dots}${evDots}</div>`;
+    const dayEvs=athEvents.filter(e=>e.date===k);
+    if(dayEvs.length){el.classList.add('has-ev');}
+    const evPills=dayEvs.slice(0,2).map(e=>{
+      const t=getEvType(e.type);
+      const title=e.title.length>12?e.title.slice(0,12)+'…':e.title;
+      const time=e.time?` ${e.time.slice(0,5)}`:'';
+      return `<div class="ev-pill" style="background:${t.color}15;border-left-color:${t.color};color:${t.color};">${t.icon} ${title}${time}</div>`;
+    }).join('');
+    const morePill=dayEvs.length>2?`<div class="ev-pill-more">+${dayEvs.length-2} más</div>`:'';
+    el.innerHTML=`<div class="cell-n">${d}</div><div class="cell-dots">${dots}</div>${evPills}${morePill}`;
     el.addEventListener('click',()=>{cur.day=d;showCal('day');});
     cells.appendChild(el);
   }
@@ -1590,7 +1616,7 @@ function renderDay(){
   document.getElementById('notes').value=note.notes||'';
   document.getElementById('sl-sl').value=note.sleep||7;
   document.getElementById('sl-val').textContent=(note.sleep||7)+'h';
-  renderHabsDay();renderWeekStrip();renderMood(note.mood);renderChart();renderWeightCard();renderStreakCard();renderDayEvents();renderNextEvents();
+  renderHabsDay();renderWeekStrip();renderMood(note.mood);renderChart();renderWeightCard();renderStreakCard();renderDayEvents();renderNextEvents();renderQuickStrip();
 }
 
 function renderHabsDay(){
@@ -1753,6 +1779,43 @@ function renderChart(){
     ctx.fillText(day.label,gx+groupW/2,H-5);
   });
   document.getElementById('chart-leg').innerHTML=habs.map(h=>`<div class="cl-i"><div class="cl-d" style="background:${h.color}"></div>${h.name}</div>`).join('');
+}
+
+// ══════════════════════════════════════
+// MOBILE QUICK STRIP
+// ══════════════════════════════════════
+function renderQuickStrip(){
+  const strip=document.getElementById('day-quick-strip');
+  if(!strip)return;
+  const k=dk(cur.year,cur.month,cur.day);
+  const note=athNotes[k]||{};
+  const streak=calcStreak();
+  const sleepVal=note.sleep||7;
+  const moodBtns=MOODS.map(m=>`<div class="qs-mood-btn${note.mood===m.e?' sel':''}" data-mood="${m.e}" onclick="selQsMood('${m.e}')" title="${m.l}">${m.e}</div>`).join('');
+  strip.innerHTML=`
+    <div class="qs-block"><span class="qs-ic">🔥</span><span class="qs-num">${streak}</span><span class="qs-lbl">días</span></div>
+    <div class="qs-sep"></div>
+    <div class="qs-block" style="gap:3px">${moodBtns}</div>
+    <div class="qs-sep"></div>
+    <div class="qs-block"><span class="qs-ic">😴</span><input type="range" class="qs-sl" id="qs-sl" min="0" max="12" step=".5" value="${sleepVal}" oninput="updQsSleep(this.value)" onchange="saveNote()"><span class="qs-sl-val" id="qs-sl-val">${sleepVal}h</span></div>`;
+}
+
+function selQsMood(emoji){
+  const k=dk(cur.year,cur.month,cur.day);
+  if(!athNotes[k])athNotes[k]={};
+  athNotes[k].mood=emoji;
+  document.querySelectorAll('.qs-mood-btn').forEach(b=>b.classList.toggle('sel',b.dataset.mood===emoji));
+  document.querySelectorAll('.mood-b').forEach(b=>b.classList.toggle('sel',b.dataset.mood===emoji));
+  saveNote();
+}
+
+function updQsSleep(v){
+  const qv=document.getElementById('qs-sl-val');
+  if(qv)qv.textContent=v+'h';
+  const mainSl=document.getElementById('sl-sl');
+  const mainVal=document.getElementById('sl-val');
+  if(mainSl)mainSl.value=v;
+  if(mainVal)mainVal.textContent=v+'h';
 }
 
 // ══════════════════════════════════════

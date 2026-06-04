@@ -706,7 +706,6 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPro
 document.getElementById('tb-date').textContent=TODAY.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
 
 async function init(){
-  try{
   // Always hide loader after 500ms max no matter what
   setTimeout(()=>{
     hideLoad();
@@ -895,7 +894,6 @@ async function loadAndRenderCoach(){
     renderCoachPanel();
     if(SUPA_CONFIGURED) toast('Error de conexión — usando modo demo');
   }
-  } catch(globalErr){ console.error('Init error:', globalErr); hideLoad(); }
 }
 
 function getDemoAthletes(){

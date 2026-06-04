@@ -59,7 +59,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 /* ── MODAL ATHLETE ── */
 .modal-bg{position:fixed;inset:0;background:rgba(42,31,22,.5);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;}
 .modal-bg.open{opacity:1;pointer-events:all;}
-.modal{background:white;border-radius:18px;width:520px;max-width:94vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);transform:scale(.96) translateY(8px);transition:transform .22s;}
+.modal{background:white;border-radius:18px;width:520px;max-width:94vw;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;box-shadow:var(--shadow-lg);transform:scale(.96) translateY(8px);transition:transform .22s;}
 .modal-bg.open .modal{transform:scale(1) translateY(0);}
 .modal-head{background:var(--terra);border-radius:18px 18px 0 0;padding:20px 24px;display:flex;align-items:center;gap:13px;}
 .modal-av{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;color:white;flex-shrink:0;}
@@ -447,17 +447,20 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
   /* Intención — compact */
   .int-area{min-height:38px;}
 
-  /* Habits — single-line rows, 26px touch targets */
-  .hab-row{gap:7px;flex-wrap:nowrap;}
-  .h-ic{width:20px;font-size:.85rem;}
-  .h-name{font-size:.75rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .h-track{flex-shrink:0;}
-  .h-check{width:26px;height:26px;min-width:26px;flex-shrink:0;}
-  .water-row{flex-wrap:wrap;gap:5px;}
-  .water-gs{display:flex;flex-wrap:wrap;gap:4px;max-width:none;}
-  .water-g{width:24px;height:24px;}
+  /* Habits — full-width rows, 28px touch targets */
+  .habs-list{overflow:visible;}
+  .hab-row{display:flex;align-items:center;gap:7px;width:100%;flex-wrap:nowrap;}
+  .h-ic{width:28px;font-size:.85rem;flex-shrink:0;text-align:center;}
+  .h-name{flex:1;font-size:.82rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .h-track{flex-shrink:0;display:flex;gap:4px;}
+  .h-check{width:28px;height:28px;min-width:28px;flex-shrink:0;}
+  /* Water habits — glasses wrap to own indented line */
+  .water-row{display:flex;flex-wrap:wrap;align-items:center;gap:5px;width:100%;}
+  .water-row .h-name{white-space:normal;}
+  .water-row .water-gs{width:100%;margin-top:6px;padding-left:36px;gap:5px;flex-shrink:0;margin-left:0;display:flex;flex-wrap:wrap;}
+  .water-g{width:26px;height:26px;}
 
-  /* Notes — 3 rows */
+  /* Notes */
   .notes-area{min-height:unset;}
 
   /* Monthly */
@@ -475,6 +478,22 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
   .ath-card{grid-template-columns:auto 1fr;}
   .a-stats{display:none;}
   .vcal-btn{opacity:1;position:static;transform:none;margin-top:6px;font-size:.6rem;}
+
+  /* Event form — stack date + time vertically */
+  .ev-date-row{flex-direction:column;gap:9px;}
+  .ev-date-row .form-group{width:100%;}
+
+  /* Touch targets ≥ 44px */
+  .form-input,.form-select,.form-textarea{min-height:44px;box-sizing:border-box;}
+  .mact,.ev-save-btn,.cust-add-btn,.ahf-save{min-height:44px;}
+  .pin-key{min-height:52px;padding:14px 13px;}
+  .pin-box{max-width:92vw;padding:24px 20px;}
+
+  /* 3-col profile grid → single col */
+  .form-row.tri{grid-template-columns:1fr;}
+
+  /* No horizontal overflow */
+  .new-ath-form,.modal-body{overflow-x:hidden;}
 
   /* Mobile nav */
   .mobile-nav{display:flex !important;}

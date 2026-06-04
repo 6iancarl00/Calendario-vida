@@ -454,6 +454,48 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:var(--perola);}
 ::-webkit-scrollbar-thumb{background:var(--bege);border-radius:3px;}
+
+/* Weight tracking */
+.weight-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.weight-inp{width:72px;padding:7px 10px;border:1.5px solid var(--bege);border-radius:8px;font-family:'Jost',sans-serif;font-size:1rem;font-weight:600;color:var(--terra);text-align:center;outline:none;background:var(--perola);transition:border-color .15s;}
+.weight-inp:focus{border-color:var(--terra);background:white;}
+.weight-unit{font-size:.74rem;color:var(--soft);}
+.sparkline-wrap{flex:1;min-width:80px;}
+
+/* Streak counter */
+.streak-row{display:flex;align-items:center;gap:10px;}
+.streak-flame{font-size:1.8rem;line-height:1;}
+.streak-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:var(--terra);line-height:1;}
+.streak-info{display:flex;flex-direction:column;gap:1px;}
+.streak-lbl{font-size:.64rem;font-weight:600;letter-spacing:.5px;color:var(--mid);}
+.streak-sub{font-size:.58rem;color:var(--soft);}
+
+/* Edit habits in modal */
+.edit-hab-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--bege);}
+.ehab-row{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--perola);}
+.ehab-row:last-child{border-bottom:none;}
+.ehab-icon{font-size:.88rem;width:19px;text-align:center;flex-shrink:0;}
+.ehab-name{font-size:.76rem;color:var(--mid);flex:1;}
+.tog-sw{position:relative;width:32px;height:18px;flex-shrink:0;cursor:pointer;display:inline-block;}
+.tog-sw input{opacity:0;width:0;height:0;position:absolute;}
+.tog-sl{position:absolute;inset:0;background:var(--perola-dark);border-radius:18px;transition:.2s;cursor:pointer;}
+.tog-sl::before{content:'';position:absolute;height:13px;width:13px;left:2.5px;bottom:2.5px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.tog-sw input:checked+.tog-sl{background:var(--terra);}
+.tog-sw input:checked+.tog-sl::before{transform:translateX(14px);}
+.add-hab-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 0;font-size:.7rem;font-family:'Jost',sans-serif;font-weight:500;cursor:pointer;background:none;color:var(--azul);border:none;margin-top:6px;text-decoration:underline;text-underline-offset:3px;}
+.add-hab-form{background:var(--perola);border-radius:9px;padding:12px;margin-top:8px;display:none;flex-wrap:wrap;gap:8px;}
+.add-hab-form.open{display:flex;}
+.ahf-emoji{width:44px;padding:7px;border:1.5px solid var(--bege);border-radius:8px;font-size:1rem;text-align:center;background:white;outline:none;font-family:'Jost',sans-serif;flex-shrink:0;}
+.ahf-hname{flex:1;min-width:120px;padding:7px 10px;border:1.5px solid var(--bege);border-radius:8px;font-family:'Jost',sans-serif;font-size:.78rem;color:var(--text);background:white;outline:none;}
+.ahf-hname:focus,.ahf-emoji:focus{border-color:var(--terra);}
+.ahf-type{padding:7px 9px;border:1.5px solid var(--bege);border-radius:8px;font-family:'Jost',sans-serif;font-size:.76rem;color:var(--text);background:white;outline:none;}
+.ahf-goal{width:52px;padding:7px 6px;border:1.5px solid var(--bege);border-radius:8px;font-family:'Jost',sans-serif;font-size:.78rem;text-align:center;color:var(--text);background:white;outline:none;}
+.ahf-save{padding:7px 16px;border-radius:7px;background:var(--terra);color:white;border:none;font-size:.72rem;font-family:'Jost',sans-serif;font-weight:600;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
+.ahf-save:hover{opacity:.88;}
+
+/* Monthly cell tints based on completion */
+.mo-cell.tint-good{background:rgba(141,149,126,.13);}
+.mo-cell.tint-low{background:rgba(184,64,64,.05);}
 </style>
 </head>
 <body>
@@ -520,6 +562,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
       </div>
       <div class="modal-sec">Hábitos · Semana actual</div>
       <div id="m-habs"></div>
+      <div id="m-edit-habs"></div>
       <div class="modal-actions">
         <button class="mact" onclick="closeModal()">✕ Cerrar</button>
         <button class="mact primary" onclick="viewAthCal()">📅 Ver su calendario</button>
@@ -651,10 +694,12 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
               <div><div class="day-dr"><div><div class="day-big" id="d-date">—</div><div class="day-wd" id="d-wd">—</div></div><div class="nav-row"><button class="nav-btn" onclick="chgDay(-1)">‹</button><button class="today-btn" onclick="goToday()">Hoy</button><button class="nav-btn" onclick="chgDay(1)">›</button></div></div></div>
               <div class="card"><div class="card-t">✦ Intención del día</div><textarea class="int-area" id="intention" placeholder="¿Con qué intención quieres vivir este día?..." rows="2" onblur="saveNote()"></textarea></div>
               <div class="card"><div class="card-t">Objetivos de hoy</div><div id="habs-cont"></div></div>
+              <div class="card"><div class="card-t">⚖️ Peso corporal</div><div id="weight-cont"></div></div>
               <div class="card"><div class="card-t">Notas del día</div><textarea class="notes-area" id="notes" placeholder="Pensamientos, reflexiones, ideas..." rows="4" onblur="saveNote()"></textarea></div>
             </div>
             <div class="day-side">
               <div class="card"><div class="card-t">Esta semana</div><div class="wk-strip" id="wk-strip"></div></div>
+              <div class="card"><div class="card-t">🔥 Racha</div><div class="streak-row"><div class="streak-flame">🔥</div><div class="streak-num" id="streak-num">0</div><div class="streak-info"><div class="streak-lbl">días</div><div class="streak-sub">consecutivos</div></div></div></div>
               <div class="card"><div class="card-t">Estado de ánimo</div><div class="mood-row" id="mood-row"></div></div>
               <div class="card"><div class="card-t">Sueño</div><div class="sl-row"><div class="sl-ic">😴</div><div class="sl-info"><div class="sl-lbl">Horas dormidas</div><input type="range" class="sl-slider" id="sl-sl" min="0" max="12" step=".5" value="7" oninput="updSleep(this.value)" onchange="saveNote()"><div class="sl-val" id="sl-val">7h</div></div></div></div>
               <div class="card"><div class="card-t">Progreso semanal</div><canvas id="prog-chart" class="chart-c" height="165"></canvas><div class="chart-leg" id="chart-leg"></div></div>
@@ -690,6 +735,9 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
   </div>
   <div class="mn-item" id="mn-annual" onclick="mobileNav('annual')">
     <span class="mn-ic">🗂</span>Anual
+  </div>
+  <div class="mn-item" id="mn-coach" onclick="mobileNav('coach')" style="display:none">
+    <span class="mn-ic">🏋️</span>Panel
   </div>
 </nav>
 
@@ -769,7 +817,7 @@ let isCoach=false, viewingAth=null, modalAth=null, pinBuf='';
 let curAthlete=null;   // loaded from DB by token
 let athHabits=[];      // habits for current athlete
 let athLogs={};        // {dateKey: {habitId: value}}
-let athNotes={};       // {dateKey: {intention,notes,mood,sleep}}
+let athNotes={};       // {dateKey: {intention,notes,mood,sleep,weight}}
 let allAthletes=[];    // coach: all athletes
 let cur={year:TODAY.getFullYear(),month:TODAY.getMonth(),day:TODAY.getDate()};
 let viewYear=TODAY.getFullYear();
@@ -816,7 +864,7 @@ async function init(){
       const logs = await sb.get('daily_logs','?athlete_id=eq.'+curAthlete.id+'&date=gte.'+from);
       logs.forEach(l=>{ if(!athLogs[l.date]) athLogs[l.date]={}; athLogs[l.date][l.habit_id]=l.value; });
       const notes = await sb.get('daily_notes','?athlete_id=eq.'+curAthlete.id+'&date=gte.'+from);
-      notes.forEach(n=>{ athNotes[n.date]={intention:n.intention,notes:n.notes,mood:n.mood,sleep:n.sleep,id:n.id}; });
+      notes.forEach(n=>{ athNotes[n.date]={intention:n.intention,notes:n.notes,mood:n.mood,sleep:n.sleep,weight:n.weight||null,id:n.id}; });
       hideLoad();
       renderAthleteMode();
       showCal('day');
@@ -879,6 +927,8 @@ async function enterCoach(){
   isCoach=true; viewingAth=null;
   document.getElementById('coach-hint').classList.add('hidden');
   document.getElementById('cb').classList.add('on');
+  const mnCoach=document.getElementById('mn-coach');
+  if(mnCoach)mnCoach.style.display='flex';
   document.getElementById('sb-mode').textContent='Panel entrenador';
   document.getElementById('sb-av').textContent='E';
   document.getElementById('sb-name').textContent='Entrenador';
@@ -895,6 +945,8 @@ function renderAthleteMode(){
   isCoach=false; viewingAth=null;
   document.getElementById('coach-hint').classList.remove('hidden');
   document.getElementById('cb').classList.remove('on');
+  const mnCoach=document.getElementById('mn-coach');
+  if(mnCoach)mnCoach.style.display='none';
   document.getElementById('sb-mode').textContent='Mi calendario';
   document.getElementById('sb-av').textContent=curAthlete?curAthlete.name.split(' ').map(w=>w[0]).join('').slice(0,2):'TU';
   document.getElementById('sb-name').textContent=curAthlete?curAthlete.name:'Tu nombre';
@@ -1083,6 +1135,7 @@ function openModal(a){
     const days=h.days.map((d,i)=>`<div class="mhr-day ${d?'done':''}" style="${d?'background:'+h.color:''}">${DFULL[(i+1)%7].slice(0,1)}</div>`).join('');
     return `<div class="modal-hab-row"><div class="mhr-icon">${h.icon||'•'}</div><div class="mhr-name">${h.name}</div><div class="mhr-days">${days}</div><div class="mhr-pct">${pct}%</div></div>`;
   }).join(''):'';
+  document.getElementById('m-edit-habs').innerHTML=isCoach?renderEditHabitsSection(a):'';
   document.getElementById('modal-bg').classList.add('open');
 }
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
@@ -1243,9 +1296,14 @@ function renderMonthly(){
   for(let d=1;d<=dim;d++){
     const el=document.createElement('div');
     const isT=d===TODAY.getDate()&&cur.month===TODAY.getMonth()&&cur.year===TODAY.getFullYear();
-    el.className='mo-cell'+(isT?' tod-c':'');
     const k=dk(cur.year,cur.month,d);
     const habs=getHabs().filter(h=>h.type!=='sleep');
+    const doneCt=habs.filter(h=>getLogVal(k,h.id)>0).length;
+    const hasData=athLogs[k]&&Object.values(athLogs[k]).some(v=>v>0);
+    const pctDay=habs.length>0?doneCt/habs.length:0;
+    let tint='';
+    if(hasData&&habs.length){tint=pctDay>0.7?' tint-good':pctDay<0.4?' tint-low':'';}
+    el.className='mo-cell'+(isT?' tod-c':'')+tint;
     const dots=habs.filter(h=>getLogVal(k,h.id)>0).map(h=>`<div class="cell-dot" style="background:${h.color}"></div>`).join('');
     el.innerHTML=`<div class="cell-n">${d}</div><div class="cell-dots">${dots}</div>`;
     el.addEventListener('click',()=>{cur.day=d;showCal('day');});
@@ -1288,7 +1346,7 @@ function renderDay(){
   document.getElementById('notes').value=note.notes||'';
   document.getElementById('sl-sl').value=note.sleep||7;
   document.getElementById('sl-val').textContent=(note.sleep||7)+'h';
-  renderHabsDay();renderWeekStrip();renderMood(note.mood);renderChart();
+  renderHabsDay();renderWeekStrip();renderMood(note.mood);renderChart();renderWeightCard();renderStreakCard();
 }
 
 function renderHabsDay(){
@@ -1406,29 +1464,211 @@ function renderMood(selected){
 function renderChart(){
   const canvas=document.getElementById('prog-chart');
   const ctx=canvas.getContext('2d');
-  const dpr=window.devicePixelRatio||1,W=canvas.parentElement.offsetWidth,H=165;
-  canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.offsetWidth||260;
+  const H=165;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
   ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
-  const habs=getHabs().filter(h=>h.type!=='sleep').slice(0,4);
+  const habs=getHabs().filter(h=>h.type!=='sleep').slice(0,5);
   if(!habs.length)return;
-  const days=[];for(let i=6;i>=0;i--){const d=new Date(cur.year,cur.month,cur.day-i);days.push({label:DFULL[d.getDay()].slice(0,1),key:dk(d.getFullYear(),d.getMonth(),d.getDate())});}
-  const P={l:5,r:5,t:11,b:22},cW=W-P.l-P.r,cH=H-P.t-P.b,sX=cW/(days.length-1);
-  ctx.strokeStyle='#E3D6C5';ctx.lineWidth=1;
-  for(let g=0;g<=4;g++){const y=P.t+cH-(g/4)*cH;ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();}
-  ctx.fillStyle='#8a7a6a';ctx.font='500 7px Jost,sans-serif';ctx.textAlign='center';
-  days.forEach((d,i)=>ctx.fillText(d.label,P.l+i*sX,H-5));
-  habs.forEach(h=>{
-    ctx.beginPath();ctx.strokeStyle=h.color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';
-    days.forEach((d,i)=>{const mx=h.goal||1;const val=Math.min(getLogVal(d.key,h.id)/mx,1);const x=P.l+i*sX,y=P.t+cH-val*cH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.stroke();
-    days.forEach((d,i)=>{const mx=h.goal||1;const val=Math.min(getLogVal(d.key,h.id)/mx,1);const x=P.l+i*sX,y=P.t+cH-val*cH;ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fillStyle=h.color;ctx.fill();});
+  const days=[];
+  for(let i=6;i>=0;i--){const d=new Date(cur.year,cur.month,cur.day-i);days.push({label:DFULL[d.getDay()].slice(0,1),key:dk(d.getFullYear(),d.getMonth(),d.getDate())});}
+  const PAD={l:6,r:6,t:10,b:24};
+  const cW=W-PAD.l-PAD.r;
+  const cH=H-PAD.t-PAD.b;
+  const groupW=cW/7;
+  const n=habs.length;
+  const barGap=2;
+  const barW=Math.max(3,(groupW-barGap*(n+1))/n);
+  const cr=Math.min(barW/2,4);
+  days.forEach((day,di)=>{
+    const gx=PAD.l+di*groupW;
+    habs.forEach((h,hi)=>{
+      const mx=h.goal||1;
+      const val=Math.min(getLogVal(day.key,h.id)/mx,1);
+      const barH=val>0?Math.max(cr*2,val*cH):0;
+      if(!barH)return;
+      const x=gx+barGap*(hi+1)+barW*hi;
+      const y=PAD.t+cH-barH;
+      ctx.beginPath();
+      ctx.fillStyle=h.color+'bb';
+      ctx.moveTo(x+cr,y);
+      ctx.lineTo(x+barW-cr,y);
+      ctx.quadraticCurveTo(x+barW,y,x+barW,y+cr);
+      ctx.lineTo(x+barW,y+barH);
+      ctx.lineTo(x,y+barH);
+      ctx.lineTo(x,y+cr);
+      ctx.quadraticCurveTo(x,y,x+cr,y);
+      ctx.closePath();
+      ctx.fill();
+    });
+    ctx.fillStyle='#8a7a6a';
+    ctx.font=`500 ${Math.min(8,Math.floor(groupW*.44))}px Jost,sans-serif`;
+    ctx.textAlign='center';
+    ctx.fillText(day.label,gx+groupW/2,H-5);
   });
   document.getElementById('chart-leg').innerHTML=habs.map(h=>`<div class="cl-i"><div class="cl-d" style="background:${h.color}"></div>${h.name}</div>`).join('');
+}
+
+// ══════════════════════════════════════
+// WEIGHT TRACKING
+// ══════════════════════════════════════
+function renderWeightCard(){
+  const cont=document.getElementById('weight-cont');
+  if(!cont)return;
+  const k=dk(cur.year,cur.month,cur.day);
+  const curW=(athNotes[k]&&athNotes[k].weight!=null)?athNotes[k].weight:'';
+  const wData=[];
+  for(let i=13;i>=0;i--){
+    const d=new Date(cur.year,cur.month,cur.day-i);
+    const dk2=dk(d.getFullYear(),d.getMonth(),d.getDate());
+    wData.push((athNotes[dk2]&&athNotes[dk2].weight!=null)?parseFloat(athNotes[dk2].weight):null);
+  }
+  cont.innerHTML=`<div class="weight-row"><input class="weight-inp" type="number" id="weight-inp" placeholder="—" step="0.1" min="20" max="400" value="${curW}" onblur="saveWeight(this.value)"><span class="weight-unit">kg</span><div class="sparkline-wrap"><canvas id="sparkline-c" height="40"></canvas></div></div>`;
+  if(wData.some(v=>v!==null)){
+    const sc=document.getElementById('sparkline-c');
+    if(sc)drawSparkline(sc,wData);
+  }
+}
+
+function drawSparkline(canvas,data){
+  const dpr=window.devicePixelRatio||1;
+  const W=Math.max(canvas.parentElement.offsetWidth||100,60);
+  const H=40;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
+  const pts=[];
+  data.forEach((v,i)=>{if(v!==null)pts.push({i,v});});
+  if(pts.length<2)return;
+  const vals=pts.map(p=>p.v);
+  const mn=Math.min(...vals),mx=Math.max(...vals),range=mx-mn||1;
+  const toX=i=>(i/(data.length-1))*(W-12)+6;
+  const toY=v=>H-8-((v-mn)/range)*(H-18);
+  // Gradient fill under line
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(151,67,21,.14)');
+  grad.addColorStop(1,'rgba(151,67,21,0)');
+  ctx.beginPath();
+  pts.forEach((p,pi)=>{const x=toX(p.i),y=toY(p.v);pi===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.lineTo(toX(pts[pts.length-1].i),H);
+  ctx.lineTo(toX(pts[0].i),H);
+  ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  // Line
+  ctx.beginPath();ctx.strokeStyle='#974315';ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.lineCap='round';
+  pts.forEach((p,pi)=>{pi===0?ctx.moveTo(toX(p.i),toY(p.v)):ctx.lineTo(toX(p.i),toY(p.v));});
+  ctx.stroke();
+  // Last point dot
+  const last=pts[pts.length-1];
+  ctx.beginPath();ctx.arc(toX(last.i),toY(last.v),3,0,Math.PI*2);ctx.fillStyle='#974315';ctx.fill();
+}
+
+async function saveWeight(val){
+  const kg=parseFloat(val);
+  if(isNaN(kg)||kg<20||kg>400)return;
+  const k=dk(cur.year,cur.month,cur.day);
+  if(!athNotes[k])athNotes[k]={};
+  athNotes[k].weight=kg;
+  renderWeightCard();
+  if(curAthlete||viewingAth){
+    const athId=(viewingAth||curAthlete).id;
+    const n=athNotes[k];
+    try{
+      await fetch(`${SUPA_URL}/rest/v1/daily_notes`,{
+        method:'POST',
+        headers:{'apikey':SUPA_KEY,'Authorization':`Bearer ${SUPA_KEY}`,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+        body:JSON.stringify({athlete_id:athId,date:k,intention:n.intention||'',notes:n.notes||'',sleep:parseFloat(n.sleep||7),mood:n.mood||'',weight:kg})
+      });
+    }catch(e){}
+  }
+}
+
+// ══════════════════════════════════════
+// STREAK COUNTER
+// ══════════════════════════════════════
+function calcStreak(){
+  let streak=0;
+  for(let i=0;i<365;i++){
+    const d=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()-i);
+    const k=dk(d.getFullYear(),d.getMonth(),d.getDate());
+    const done=athLogs[k]&&Object.values(athLogs[k]).some(v=>v>0);
+    if(done){streak++;}
+    else if(i===0){/* today can be empty — don't break the streak yet */}
+    else{break;}
+  }
+  return streak;
+}
+
+function renderStreakCard(){
+  const el=document.getElementById('streak-num');
+  if(el)el.textContent=calcStreak();
+}
+
+// ══════════════════════════════════════
+// EDIT HABITS IN MODAL
+// ══════════════════════════════════════
+function renderEditHabitsSection(a){
+  const habs=a.habits||[];
+  const rows=habs.map(h=>{
+    const checked=h.enabled!==false?'checked':'';
+    const hid=String(h.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const aid=String(a.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div class="ehab-row"><div class="ehab-icon">${h.icon||'•'}</div><div class="ehab-name">${h.name}</div><label class="tog-sw"><input type="checkbox" ${checked} onchange="toggleHabitEnabled('${aid}','${hid}',this.checked)"><span class="tog-sl"></span></label></div>`;
+  }).join('');
+  const aid=String(a.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  return `<div class="edit-hab-section">
+    <div class="modal-sec" style="margin-bottom:8px">Editar hábitos</div>
+    ${rows}
+    <button class="add-hab-btn" onclick="showAddHabitForm()">＋ Añadir hábito</button>
+    <div class="add-hab-form" id="add-hab-form">
+      <input class="ahf-emoji" id="ahf-icon" type="text" placeholder="🎯" maxlength="2" value="🎯">
+      <input class="ahf-hname" id="ahf-hname" type="text" placeholder="Nombre del hábito">
+      <select class="ahf-type" id="ahf-type"><option value="check">✓ Check</option><option value="water">💧 Agua</option><option value="sleep">😴 Sueño</option></select>
+      <input class="ahf-goal" id="ahf-goal" type="number" min="1" max="20" value="1" placeholder="Meta">
+      <button class="ahf-save" onclick="saveAddedHabit('${aid}')">Guardar</button>
+    </div>
+  </div>`;
+}
+
+function showAddHabitForm(){
+  const f=document.getElementById('add-hab-form');
+  if(f)f.classList.toggle('open');
+}
+
+async function toggleHabitEnabled(athId,habId,enabled){
+  const a=allAthletes.find(x=>String(x.id)===String(athId));
+  if(a&&a.habits){const h=a.habits.find(x=>String(x.id)===String(habId));if(h)h.enabled=enabled;}
+  try{await sb.patch('habits',{enabled},'?id=eq.'+habId);}catch(e){}
+  toast(enabled?'Hábito activado':'Hábito desactivado');
+}
+
+async function saveAddedHabit(athId){
+  const icon=(document.getElementById('ahf-icon').value||'🎯').trim();
+  const name=(document.getElementById('ahf-hname').value||'').trim();
+  const type=document.getElementById('ahf-type').value;
+  const goal=parseInt(document.getElementById('ahf-goal').value)||1;
+  if(!name){toast('Escribe el nombre del hábito');return;}
+  const colors=['#974315','#788990','#8D957E','#b0795a','#6b8c6b','#c4956a'];
+  const color=colors[Math.floor(Math.random()*colors.length)];
+  const a=allAthletes.find(x=>String(x.id)===String(athId));
+  const pos=(a&&a.habits)?a.habits.length:0;
+  try{
+    const [hab]=await sb.post('habits',{athlete_id:athId,name,icon,color,type,goal,position:pos,enabled:true});
+    if(a){if(!a.habits)a.habits=[];a.habits.push(hab);}
+    toast('Hábito añadido');openModal(a);
+  }catch(e){
+    const fakeHab={id:'h'+Date.now(),name,icon,color,type,goal,position:pos,enabled:true};
+    if(a){if(!a.habits)a.habits=[];a.habits.push(fakeHab);}
+    toast('Hábito añadido');openModal(a);
+  }
 }
 
 window.addEventListener('resize',()=>{if(document.getElementById('cv-day').classList.contains('active'))renderChart();});
 
 function mobileNav(v){
+  if(v==='coach'){enterCoach();return;}
   document.querySelectorAll('.mn-item').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('mn-'+v);
   if(el) el.classList.add('active');

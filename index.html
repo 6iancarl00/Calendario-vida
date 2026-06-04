@@ -522,6 +522,47 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 /* Monthly cell tints based on completion */
 .mo-cell.tint-good{background:rgba(141,149,126,.13);}
 .mo-cell.tint-low{background:rgba(184,64,64,.05);}
+
+/* Events system */
+.ev-list{display:flex;flex-direction:column;gap:7px;}
+.ev-card{background:white;border-left:3px solid var(--bege);border-radius:9px;padding:10px 13px;display:flex;align-items:flex-start;gap:10px;}
+.ev-ic{font-size:1.05rem;flex-shrink:0;margin-top:1px;}
+.ev-body{flex:1;min-width:0;}
+.ev-title{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:1px;}
+.ev-meta{font-size:.64rem;color:var(--soft);}
+.ev-notes{font-size:.7rem;color:var(--mid);margin-top:3px;font-style:italic;line-height:1.4;}
+.ev-empty{text-align:center;padding:16px 10px;font-size:.74rem;color:var(--soft);}
+
+/* Upcoming events sidebar */
+.uev-i{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--perola-dark);}
+.uev-i:last-child{border-bottom:none;padding-bottom:0;}
+.uev-ic{font-size:.95rem;width:20px;text-align:center;flex-shrink:0;}
+.uev-body{flex:1;min-width:0;}
+.uev-t{font-size:.73rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.uev-d{font-size:.6rem;color:var(--soft);margin-top:1px;}
+
+/* Modal tabs */
+.m-tabs{display:flex;gap:0;border-bottom:2px solid var(--bege);margin-bottom:12px;}
+.m-tab{padding:6px 14px;font-size:.66rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--soft);cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Jost',sans-serif;transition:all .15s;}
+.m-tab.active{color:var(--terra);border-bottom-color:var(--terra);}
+.m-tab:hover{color:var(--terra);}
+
+/* Event creation form */
+.ev-add-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 0;font-size:.7rem;font-family:'Jost',sans-serif;font-weight:500;cursor:pointer;background:none;color:var(--azul);border:none;text-decoration:underline;text-underline-offset:3px;margin-top:4px;}
+.ev-form{background:var(--perola);border-radius:9px;padding:12px;margin-top:8px;display:none;flex-direction:column;gap:9px;}
+.ev-form.open{display:flex;}
+.ev-type-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;}
+.ev-type-btn{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;border:1.5px solid var(--bege);background:white;font-size:.66rem;font-family:'Jost',sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ev-type-btn:hover{border-color:var(--terra);}
+.ev-type-btn.sel{border-color:var(--terra);background:var(--perola);font-weight:600;color:var(--terra);}
+.ev-save-btn{padding:8px 16px;border-radius:7px;background:var(--terra);color:white;border:none;font-size:.72rem;font-family:'Jost',sans-serif;font-weight:600;cursor:pointer;align-self:flex-end;transition:opacity .15s;}
+.ev-save-btn:hover{opacity:.88;}
+.ev-date-row{display:flex;gap:8px;}
+.ev-date-row .form-group{flex:1;margin:0;}
+
+/* Annual mini-cal event indicator */
+.mini-d.hev{outline:1.5px solid var(--warn);outline-offset:-1.5px;border-radius:3px;}
+.mini-d.hev.hd{outline-color:var(--verde);}
 </style>
 </head>
 <body>
@@ -586,9 +627,29 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
         <div class="mst"><div class="mst-val" id="m-streak">—</div><div class="mst-lbl">Racha</div></div>
         <div class="mst"><div class="mst-val" id="m-bh">—</div><div class="mst-lbl">Mejor hábito</div></div>
       </div>
-      <div class="modal-sec">Hábitos · Semana actual</div>
-      <div id="m-habs"></div>
-      <div id="m-edit-habs"></div>
+      <div class="m-tabs">
+        <button class="m-tab active" onclick="switchModalTab(this,'habs')">Hábitos</button>
+        <button class="m-tab" onclick="switchModalTab(this,'events')">Eventos</button>
+      </div>
+      <div id="m-tab-habs">
+        <div class="modal-sec">Hábitos · Semana actual</div>
+        <div id="m-habs"></div>
+        <div id="m-edit-habs"></div>
+      </div>
+      <div id="m-tab-events" style="display:none">
+        <div class="ev-list" id="m-events-list"></div>
+        <button class="ev-add-btn" id="m-ev-add-btn" style="display:none" onclick="toggleEvForm()">＋ Añadir evento</button>
+        <div class="ev-form" id="ev-form">
+          <div class="form-group" style="margin:0"><label>Título del evento</label><input class="form-input" id="ev-title" type="text" placeholder="Ej: Pesaje semanal, Revisión..."></div>
+          <div class="ev-date-row">
+            <div class="form-group"><label>Fecha</label><input class="form-input" id="ev-date" type="date"></div>
+            <div class="form-group"><label>Hora (opcional)</label><input class="form-input" id="ev-time" type="time"></div>
+          </div>
+          <div class="form-group" style="margin:0"><label>Tipo</label><div class="ev-type-row" id="ev-type-row"></div></div>
+          <div class="form-group" style="margin:0"><label>Notas (opcional)</label><textarea class="form-textarea" id="ev-notes-field" placeholder="Observaciones para el atleta..." rows="2"></textarea></div>
+          <button class="ev-save-btn" onclick="saveEvent()">Guardar evento</button>
+        </div>
+      </div>
       <div class="modal-actions">
         <button class="mact" onclick="closeModal()">✕ Cerrar</button>
         <button class="mact primary" onclick="viewAthCal()">📅 Ver su calendario</button>
@@ -758,6 +819,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
           <div class="day-layout">
             <div class="day-main">
               <div><div class="day-dr"><div><div class="day-big" id="d-date">—</div><div class="day-wd" id="d-wd">—</div></div><div class="nav-row"><button class="nav-btn" onclick="chgDay(-1)">‹</button><button class="today-btn" onclick="goToday()">Hoy</button><button class="nav-btn" onclick="chgDay(1)">›</button></div></div></div>
+              <div id="day-events-card" style="display:none"></div>
               <div class="card"><div class="card-t">✦ Intención del día</div><textarea class="int-area" id="intention" placeholder="¿Con qué intención quieres vivir este día?..." rows="2" onblur="saveNote()"></textarea></div>
               <div class="card"><div class="card-t">Objetivos de hoy</div><div id="habs-cont"></div></div>
               <div class="card"><div class="card-t">⚖️ Peso corporal</div><div id="weight-cont"></div></div>
@@ -766,6 +828,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
             <div class="day-side">
               <div class="card"><div class="card-t">Esta semana</div><div class="wk-strip" id="wk-strip"></div></div>
               <div class="card"><div class="card-t">🔥 Racha</div><div class="streak-row"><div class="streak-flame">🔥</div><div class="streak-num" id="streak-num">0</div><div class="streak-info"><div class="streak-lbl">días</div><div class="streak-sub">consecutivos</div></div></div></div>
+              <div class="card" id="upcoming-events-card" style="display:none"><div class="card-t">📅 Próximos eventos</div><div id="upcoming-events-body"></div></div>
               <div class="card"><div class="card-t">Estado de ánimo</div><div class="mood-row" id="mood-row"></div></div>
               <div class="card"><div class="card-t">Sueño</div><div class="sl-row"><div class="sl-ic">😴</div><div class="sl-info"><div class="sl-lbl">Horas dormidas</div><input type="range" class="sl-slider" id="sl-sl" min="0" max="12" step=".5" value="7" oninput="updSleep(this.value)" onchange="saveNote()"><div class="sl-val" id="sl-val">7h</div></div></div></div>
               <div class="card"><div class="card-t">Progreso semanal</div><canvas id="prog-chart" class="chart-c" height="165"></canvas><div class="chart-leg" id="chart-leg"></div></div>
@@ -863,6 +926,13 @@ const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto
 const DSHORT = ['D','L','M','X','J','V','S'];
 const DFULL  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const MOODS  = [{e:'😔',l:'Difícil'},{e:'😐',l:'Regular'},{e:'🙂',l:'Bien'},{e:'😊',l:'Genial'},{e:'✨',l:'Pleno'}];
+const EV_TYPES={
+  general:    {icon:'📅',color:'#b8a898',label:'General'},
+  pesaje:     {icon:'⚖️',color:'#788990',label:'Pesaje'},
+  entrenamiento:{icon:'🏋️',color:'#974315',label:'Entrenamiento'},
+  revision:   {icon:'🩺',color:'#8D957E',label:'Revisión médica'},
+  objetivo:   {icon:'🎯',color:'#c4783a',label:'Objetivo'},
+};
 const ALL_HABITS = [
   {id:'agua',  icon:'💧',name:'Agua (vasos)',   color:'#788990',type:'water',goal:8},
   {id:'nutri', icon:'🥗',name:'Nutrición',      color:'#8D957E',type:'check',goal:3},
@@ -884,7 +954,10 @@ let curAthlete=null;   // loaded from DB by token
 let athHabits=[];      // habits for current athlete
 let athLogs={};        // {dateKey: {habitId: value}}
 let athNotes={};       // {dateKey: {intention,notes,mood,sleep,weight}}
+let athEvents=[];      // [{id,athlete_id,title,date,time,type,notes}]
 let allAthletes=[];    // coach: all athletes
+let evSelectedType='general';
+let evFormAthId=null;
 let cur={year:TODAY.getFullYear(),month:TODAY.getMonth(),day:TODAY.getDate()};
 let viewYear=TODAY.getFullYear();
 let deferredPrompt=null;
@@ -931,6 +1004,8 @@ async function init(){
       logs.forEach(l=>{ if(!athLogs[l.date]) athLogs[l.date]={}; athLogs[l.date][l.habit_id]=l.value; });
       const notes = await sb.get('daily_notes','?athlete_id=eq.'+curAthlete.id+'&date=gte.'+from);
       notes.forEach(n=>{ athNotes[n.date]={intention:n.intention,notes:n.notes,mood:n.mood,sleep:n.sleep,weight:n.weight||null,id:n.id}; });
+      const evs = await sb.get('events','?athlete_id=eq.'+curAthlete.id+'&order=date').catch(()=>[]);
+      athEvents = evs;
       hideLoad();
       renderAthleteMode();
       showCal('day');
@@ -1077,6 +1152,7 @@ async function loadAndRenderCoach(){
     const from = dk(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()-7);
     const logs  = await sb.get('daily_logs',`?date=gte.${from}`);
     const notes = await sb.get('daily_notes',`?date=gte.${from}`);
+    const allEvs = await sb.get('events','?order=date').catch(()=>[]);
 
     allAthletes = athletes.map(a=>{
       const aLogs = logs.filter(l=>l.athlete_id===a.id);
@@ -1092,7 +1168,8 @@ async function loadAndRenderCoach(){
         })
       }));
       const lastNote = aNotes.sort((a,b)=>b.date.localeCompare(a.date))[0];
-      return {...a, _wd:wd, _lastNote:lastNote};
+      const _events = allEvs.filter(e=>e.athlete_id===a.id);
+      return {...a, _wd:wd, _lastNote:lastNote, _events};
     });
     hideLoad();
     renderCoachPanel();
@@ -1207,6 +1284,25 @@ function openModal(a){
     return `<div class="modal-hab-row"><div class="mhr-icon">${h.icon||'•'}</div><div class="mhr-name">${h.name}</div><div class="mhr-days">${days}</div><div class="mhr-pct">${pct}%</div></div>`;
   }).join(''):'';
   document.getElementById('m-edit-habs').innerHTML=isCoach?renderEditHabitsSection(a):'';
+  // Events tab
+  evFormAthId=a.id;
+  renderModalEvents(a);
+  const addBtn=document.getElementById('m-ev-add-btn');
+  if(addBtn)addBtn.style.display=isCoach?'':'none';
+  const evForm=document.getElementById('ev-form');
+  if(evForm)evForm.classList.remove('open');
+  // Populate type buttons
+  const typeRow=document.getElementById('ev-type-row');
+  if(typeRow)typeRow.innerHTML=Object.entries(EV_TYPES).map(([k,v])=>`<button class="ev-type-btn${k===evSelectedType?' sel':''}" onclick="selEvType(this,'${k}')">${v.icon} ${v.label}</button>`).join('');
+  // Reset to habs tab
+  document.querySelectorAll('.m-tab').forEach(t=>t.classList.remove('active'));
+  const firstTab=document.querySelector('.m-tab');
+  if(firstTab)firstTab.classList.add('active');
+  document.getElementById('m-tab-habs').style.display='';
+  document.getElementById('m-tab-events').style.display='none';
+  // Default date for event form
+  const evDateEl=document.getElementById('ev-date');
+  if(evDateEl&&!evDateEl.value)evDateEl.value=dk(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
   document.getElementById('modal-bg').classList.add('open');
 }
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
@@ -1216,8 +1312,9 @@ function viewAthCal(){closeModal();openAthCal(modalAth.id);}
 function openAthCal(id){
   const a=allAthletes.find(x=>x.id===id);if(!a)return;
   viewingAth=a;
-  // Use this athlete's habits for the calendar
+  // Use this athlete's habits and events for the calendar
   athHabits=a.habits||a._wd||[];
+  athEvents=a._events||[];
   document.getElementById('vbanner').classList.add('on');
   document.getElementById('vb-name').textContent=a.name;
   document.getElementById('vp').style.display='block';
@@ -1229,6 +1326,7 @@ function openAthCal(id){
 async function exitAthView(){
   viewingAth=null;
   athHabits=curAthlete?(await sb.get('habits','?athlete_id=eq.'+curAthlete.id+'&order=position').catch(()=>[])):[];
+  athEvents=curAthlete?(await sb.get('events','?athlete_id=eq.'+curAthlete.id+'&order=date').catch(()=>[])):[];
   document.getElementById('vbanner').classList.remove('on');
   if(isCoach){await enterCoach();}else{renderAthleteMode();}
 }
@@ -1392,7 +1490,8 @@ function renderAnnual(){
       const el=document.createElement('div');
       const k=dk(viewYear,m,d);
       const has=athLogs[k]&&Object.values(athLogs[k]).some(v=>v>0);
-      el.className='mini-d'+(has?' hd':'')+(d===TODAY.getDate()&&m===TODAY.getMonth()&&viewYear===TODAY.getFullYear()?' tod':'');
+      const hasEv=athEvents.some(e=>e.date===k);
+      el.className='mini-d'+(has?' hd':'')+(hasEv?' hev':'')+(d===TODAY.getDate()&&m===TODAY.getMonth()&&viewYear===TODAY.getFullYear()?' tod':'');
       el.textContent=d;
       el.addEventListener('click',()=>{cur.month=m;cur.day=d;showCal('day');});
       mg.appendChild(el);
@@ -1425,7 +1524,8 @@ function renderMonthly(){
     if(hasData&&habs.length){tint=pctDay>0.7?' tint-good':pctDay<0.4?' tint-low':'';}
     el.className='mo-cell'+(isT?' tod-c':'')+tint;
     const dots=habs.filter(h=>getLogVal(k,h.id)>0).map(h=>`<div class="cell-dot" style="background:${h.color}"></div>`).join('');
-    el.innerHTML=`<div class="cell-n">${d}</div><div class="cell-dots">${dots}</div>`;
+    const evDots=athEvents.filter(e=>e.date===k).map(e=>{const t=getEvType(e.type);return `<div class="cell-dot" style="background:${t.color};border-radius:2px;width:5px;height:5px;"></div>`;}).join('');
+    el.innerHTML=`<div class="cell-n">${d}</div><div class="cell-dots">${dots}${evDots}</div>`;
     el.addEventListener('click',()=>{cur.day=d;showCal('day');});
     cells.appendChild(el);
   }
@@ -1442,8 +1542,8 @@ function renderWeekly(){
   const cols=[{t:'time'},...days.map((d,i)=>({t:'day',date:d,idx:i+1}))];
   const habs=getHabs().filter(h=>h.type!=='sleep');
   cols.forEach(col=>{const el=document.createElement('div');if(col.t==='time'){el.className='wc-h wc-t';el.style.cssText='padding:9px 4px 7px;border-bottom:2px solid rgba(255,255,255,.15);background:var(--terra);';el.innerHTML='<span style="color:rgba(240,237,228,.3);font-size:.48rem;display:block;text-align:center;text-transform:uppercase;letter-spacing:1px">HORA</span>';}else{const isT=col.date.getDate()===TODAY.getDate()&&col.date.getMonth()===TODAY.getMonth()&&col.date.getFullYear()===TODAY.getFullYear();el.className='wc-h'+(isT?' ist':'');el.innerHTML=`<span class="wch-n">${DFULL[col.date.getDay()]}</span><span class="wch-num">${col.date.getDate()}</span>`;}wrap.appendChild(el);});
-  cols.forEach(col=>{const el=document.createElement('div');if(col.t==='time'){el.className='wc-habs wc-t tl';el.textContent='HÁBITOS';}else{el.className='wc-habs wc-d';const k=dk(col.date.getFullYear(),col.date.getMonth(),col.date.getDate());const dots=habs.map(h=>{const done=getLogVal(k,h.id)>0;return `<div class="wh-dot ${done?'done':''}" style="background:${h.color}"></div>`;}).join('');el.innerHTML=`<div class="wh-dots">${dots}</div>`;el.addEventListener('click',()=>{cur.year=col.date.getFullYear();cur.month=col.date.getMonth();cur.day=col.date.getDate();showCal('day');});}wrap.appendChild(el);});
-  HOURS.forEach(hour=>{cols.forEach(col=>{const el=document.createElement('div');if(col.t==='time'){el.className='wc-slot wc-t tl';el.textContent=`${hour}:00`;}else{el.className='wc-slot wc-d';DEMO_EVENTS.filter(e=>e.day===col.idx&&Math.floor(e.hour)===hour).forEach(ev=>{const ee=document.createElement('div');ee.className='wc-ev';ee.style.cssText=`background:${ev.color}22;border-left:3px solid ${ev.color};color:${ev.color};top:2px;height:${ev.dur*40-4}px;`;ee.textContent=ev.label;el.appendChild(ee);});el.addEventListener('click',()=>{cur.year=col.date.getFullYear();cur.month=col.date.getMonth();cur.day=col.date.getDate();showCal('day');});}wrap.appendChild(el);});});
+  cols.forEach(col=>{const el=document.createElement('div');if(col.t==='time'){el.className='wc-habs wc-t tl';el.textContent='HÁBITOS';}else{el.className='wc-habs wc-d';const k=dk(col.date.getFullYear(),col.date.getMonth(),col.date.getDate());const dots=habs.map(h=>{const done=getLogVal(k,h.id)>0;return `<div class="wh-dot ${done?'done':''}" style="background:${h.color}"></div>`;}).join('');const allDay=athEvents.filter(e=>e.date===k&&!e.time).map(e=>{const t=getEvType(e.type);return `<div style="font-size:.48rem;padding:1px 4px;border-radius:2px;background:${t.color}22;border-left:2px solid ${t.color};color:${t.color};white-space:nowrap;overflow:hidden;margin-top:2px;">${t.icon} ${e.title}</div>`;}).join('');el.innerHTML=`<div class="wh-dots">${dots}</div>${allDay}`;el.addEventListener('click',()=>{cur.year=col.date.getFullYear();cur.month=col.date.getMonth();cur.day=col.date.getDate();showCal('day');});}wrap.appendChild(el);});
+  HOURS.forEach(hour=>{cols.forEach(col=>{const el=document.createElement('div');if(col.t==='time'){el.className='wc-slot wc-t tl';el.textContent=`${hour}:00`;}else{el.className='wc-slot wc-d';const dayStr=dk(col.date.getFullYear(),col.date.getMonth(),col.date.getDate());if(athEvents.length){athEvents.filter(e=>e.date===dayStr&&e.time&&parseInt(e.time.split(':')[0])===hour).forEach(ev=>{const t=getEvType(ev.type);const ee=document.createElement('div');ee.className='wc-ev';ee.style.cssText=`background:${t.color}22;border-left:3px solid ${t.color};color:${t.color};top:2px;height:34px;`;ee.textContent=`${t.icon} ${ev.title}`;el.appendChild(ee);});}else{DEMO_EVENTS.filter(e=>e.day===col.idx&&Math.floor(e.hour)===hour).forEach(ev=>{const ee=document.createElement('div');ee.className='wc-ev';ee.style.cssText=`background:${ev.color}22;border-left:3px solid ${ev.color};color:${ev.color};top:2px;height:${ev.dur*40-4}px;`;ee.textContent=ev.label;el.appendChild(ee);});}el.addEventListener('click',()=>{cur.year=col.date.getFullYear();cur.month=col.date.getMonth();cur.day=col.date.getDate();showCal('day');});}wrap.appendChild(el);});});
   cols.forEach(col=>{const el=document.createElement('div');if(col.t==='time'){el.className='wc-prog wc-t tl';el.textContent='%';}else{el.className='wc-prog wc-d';const k=dk(col.date.getFullYear(),col.date.getMonth(),col.date.getDate());const tot=habs.reduce((s,h)=>s+(h.goal||1),0);const done=habs.reduce((s,h)=>s+Math.min(getLogVal(k,h.id),h.goal||1),0);const pct=tot>0?Math.round(done/tot*100):0;const bc=pct>=80?'var(--verde)':pct>=50?'var(--azul)':'var(--terra)';el.innerHTML=`<div class="wc-pb"><div class="wc-pf" style="width:${pct}%;background:${bc}"></div></div><div class="wc-pp" style="color:${bc}">${pct}%</div>`;}wrap.appendChild(el);});
   const allK=days.map(d=>dk(d.getFullYear(),d.getMonth(),d.getDate()));
   let tD=0,tP=0;allK.forEach(k=>{habs.forEach(h=>{const mx=h.goal||1;tP+=mx;tD+=Math.min(getLogVal(k,h.id),mx);});});
@@ -1466,7 +1566,7 @@ function renderDay(){
   document.getElementById('notes').value=note.notes||'';
   document.getElementById('sl-sl').value=note.sleep||7;
   document.getElementById('sl-val').textContent=(note.sleep||7)+'h';
-  renderHabsDay();renderWeekStrip();renderMood(note.mood);renderChart();renderWeightCard();renderStreakCard();
+  renderHabsDay();renderWeekStrip();renderMood(note.mood);renderChart();renderWeightCard();renderStreakCard();renderDayEvents();renderNextEvents();
 }
 
 function renderHabsDay(){
@@ -1629,6 +1729,98 @@ function renderChart(){
     ctx.fillText(day.label,gx+groupW/2,H-5);
   });
   document.getElementById('chart-leg').innerHTML=habs.map(h=>`<div class="cl-i"><div class="cl-d" style="background:${h.color}"></div>${h.name}</div>`).join('');
+}
+
+// ══════════════════════════════════════
+// EVENTS SYSTEM
+// ══════════════════════════════════════
+function getEvType(t){return EV_TYPES[t]||EV_TYPES.general;}
+function evDateStr(d){
+  const dt=new Date(d+'T12:00:00');
+  return `${dt.getDate()} ${MONTHS[dt.getMonth()].slice(0,3)}`;
+}
+
+function renderDayEvents(){
+  const k=dk(cur.year,cur.month,cur.day);
+  const card=document.getElementById('day-events-card');
+  if(!card)return;
+  const evs=athEvents.filter(e=>e.date===k).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  if(!evs.length){card.style.display='none';return;}
+  card.style.display='';
+  const items=evs.map(e=>{
+    const t=getEvType(e.type);
+    return `<div class="ev-card" style="border-left-color:${t.color}"><div class="ev-ic">${t.icon}</div><div class="ev-body"><div class="ev-title">${e.title}</div><div class="ev-meta">${t.label}${e.time?' · '+e.time:''}</div>${e.notes?`<div class="ev-notes">${e.notes}</div>`:''}</div></div>`;
+  }).join('');
+  card.innerHTML=`<div class="card"><div class="card-t">📅 Eventos del día</div><div class="ev-list">${items}</div></div>`;
+}
+
+function renderNextEvents(){
+  const card=document.getElementById('upcoming-events-card');
+  if(!card)return;
+  const todayStr=dk(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
+  const upcoming=athEvents.filter(e=>e.date>=todayStr).sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||'')).slice(0,3);
+  if(!upcoming.length){card.style.display='none';return;}
+  card.style.display='';
+  const body=document.getElementById('upcoming-events-body');
+  if(body)body.innerHTML=upcoming.map(e=>{
+    const t=getEvType(e.type);
+    return `<div class="uev-i"><div class="uev-ic">${t.icon}</div><div class="uev-body"><div class="uev-t">${e.title}</div><div class="uev-d">${evDateStr(e.date)}${e.time?' · '+e.time:''}</div></div></div>`;
+  }).join('');
+}
+
+function renderModalEvents(a){
+  const evs=((a._events||[]).slice()).sort((x,y)=>x.date.localeCompare(y.date));
+  const todayStr=dk(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
+  const list=document.getElementById('m-events-list');
+  if(!list)return;
+  if(!evs.length){list.innerHTML=`<div class="ev-empty">Sin eventos programados</div>`;return;}
+  list.innerHTML=`<div class="ev-list">${evs.map(e=>{const t=getEvType(e.type);const past=e.date<todayStr;return `<div class="ev-card" style="border-left-color:${t.color};${past?'opacity:.55':''}"><div class="ev-ic">${t.icon}</div><div class="ev-body"><div class="ev-title">${e.title}</div><div class="ev-meta">${evDateStr(e.date)}${e.time?' · '+e.time:''} · ${t.label}</div>${e.notes?`<div class="ev-notes">${e.notes}</div>`:''}</div></div>`;}).join('')}</div>`;
+}
+
+function switchModalTab(el,tab){
+  document.querySelectorAll('.m-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('m-tab-habs').style.display=tab==='habs'?'':'none';
+  document.getElementById('m-tab-events').style.display=tab==='events'?'':'none';
+}
+
+function toggleEvForm(){
+  const f=document.getElementById('ev-form');
+  if(f)f.classList.toggle('open');
+}
+
+function selEvType(el,type){
+  document.querySelectorAll('.ev-type-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  evSelectedType=type;
+}
+
+async function saveEvent(){
+  const title=(document.getElementById('ev-title').value||'').trim();
+  if(!title){toast('Escribe un título para el evento');return;}
+  const date=document.getElementById('ev-date').value;
+  if(!date){toast('Elige una fecha');return;}
+  const time=document.getElementById('ev-time').value||null;
+  const notes=(document.getElementById('ev-notes-field').value||'').trim()||null;
+  const athId=evFormAthId;
+  const payload={athlete_id:athId,title,date,time,type:evSelectedType,notes};
+  const a=allAthletes.find(x=>x.id===athId);
+  try{
+    const [saved]=await sb.post('events',payload);
+    const ev=saved||{...payload,id:'e'+Date.now()};
+    if(a){if(!a._events)a._events=[];a._events.push(ev);}
+    document.getElementById('ev-title').value='';
+    document.getElementById('ev-time').value='';
+    document.getElementById('ev-notes-field').value='';
+    toast('Evento guardado');
+    if(a){openModal(a);setTimeout(()=>switchModalTab(document.querySelectorAll('.m-tab')[1],'events'),50);}
+  }catch(e){
+    const ev={...payload,id:'e'+Date.now()};
+    if(a){if(!a._events)a._events=[];a._events.push(ev);}
+    document.getElementById('ev-title').value='';
+    toast('Evento guardado (demo)');
+    if(a){openModal(a);setTimeout(()=>switchModalTab(document.querySelectorAll('.m-tab')[1],'events'),50);}
+  }
 }
 
 // ══════════════════════════════════════

@@ -380,6 +380,76 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
   .day-layout{grid-template-columns:1fr;}
   .wk-stats{grid-template-columns:repeat(2,1fr);}
   .wk-cols{grid-template-columns:36px repeat(7,1fr);}
+  .main{padding:14px 12px;}
+  .topbar{padding:0 14px;height:52px;}
+  .tb-date{display:none;}
+  .tb-btn{padding:6px 10px;font-size:.65rem;}
+  .coach-badge{font-size:.55rem;padding:2px 7px;}
+
+  /* Cal tabs — scroll horizontal */
+  .cal-tabs{border-radius:8px 8px 0 0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .cal-tab{padding:10px 12px;font-size:.6rem;white-space:nowrap;flex-shrink:0;}
+  .cal-yr{display:none;}
+
+  /* Day view */
+  .day-big{font-size:2rem;}
+  .day-side{display:none;} /* hide sidebar on mobile day view */
+  .card{padding:14px 15px;}
+  .card-t{font-size:.88rem;margin-bottom:10px;}
+
+  /* Habits — make sure checks are visible */
+  .hab-row{gap:8px;}
+  .h-name{font-size:.74rem;}
+  .h-check{width:26px;height:26px;flex-shrink:0;}
+  .water-row{flex-wrap:wrap;gap:6px;}
+  .water-gs{gap:4px;}
+  .water-g{width:24px;height:24px;}
+
+  /* Week strip */
+  .wk-strip{gap:2px;}
+  .ws-b{padding:5px 1px;}
+  .ws-num{font-size:.75rem;}
+
+  /* Mood */
+  .mood-b{font-size:.88rem;padding:5px 2px;}
+  .mood-l{font-size:.5rem;}
+
+  /* Monthly */
+  .mo-cell{min-height:44px;padding:4px 3px;}
+  .cell-n{font-size:.68rem;width:18px;height:18px;}
+
+  /* Coach panel mobile */
+  .ath-card{grid-template-columns:auto 1fr;}
+  .a-stats{display:none;}
+  .vcal-btn{opacity:1;position:static;transform:none;margin-top:6px;font-size:.6rem;}
+
+  /* Bottom nav for mobile */
+  .mobile-nav{display:flex !important;}
+}
+
+/* Mobile bottom navigation */
+.mobile-nav{
+  display:none;
+  position:fixed;
+  bottom:0;left:0;right:0;
+  background:white;
+  border-top:1px solid var(--perola-dark);
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+  z-index:40;
+  box-shadow:0 -2px 16px rgba(151,67,21,.08);
+}
+.mn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:4px 0;
+  font-size:.52rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--soft);transition:color .15s;
+}
+.mn-item.active{color:var(--terra);}
+.mn-item .mn-ic{font-size:1.2rem;}
+/* Add padding to main when mobile nav is visible */
+@media(max-width:820px){
+  .main{padding-bottom:80px;}
+  #app{grid-template-rows:auto 1fr;}
 }
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:var(--perola);}
@@ -606,6 +676,22 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
   </main>
 </div>
 <div class="coach-hint" id="coach-hint" onclick="openPIN()" title="Acceso entrenador">🏋️</div>
+
+<!-- Mobile bottom navigation -->
+<nav class="mobile-nav" id="mobile-nav">
+  <div class="mn-item active" id="mn-day" onclick="mobileNav('day')">
+    <span class="mn-ic">📅</span>Hoy
+  </div>
+  <div class="mn-item" id="mn-monthly" onclick="mobileNav('monthly')">
+    <span class="mn-ic">📆</span>Mensual
+  </div>
+  <div class="mn-item" id="mn-weekly" onclick="mobileNav('weekly')">
+    <span class="mn-ic">🗓</span>Semanal
+  </div>
+  <div class="mn-item" id="mn-annual" onclick="mobileNav('annual')">
+    <span class="mn-ic">🗂</span>Anual
+  </div>
+</nav>
 
 <script>
 // ══════════════════════════════════════
@@ -1341,6 +1427,23 @@ function renderChart(){
 }
 
 window.addEventListener('resize',()=>{if(document.getElementById('cv-day').classList.contains('active'))renderChart();});
+
+function mobileNav(v){
+  document.querySelectorAll('.mn-item').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('mn-'+v);
+  if(el) el.classList.add('active');
+  showScreen('cal');
+  showCal(v);
+}
+
+// Hide mobile nav when in coach panel
+const _origShowScreen = showScreen;
+function showScreen(s){
+  _origShowScreen(s);
+  const nav=document.getElementById('mobile-nav');
+  if(nav) nav.style.display = s==='coach' ? 'none' : '';
+}
+
 init();
 </script>
 </body>

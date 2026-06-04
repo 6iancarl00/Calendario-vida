@@ -727,8 +727,9 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 
       <div class="modal-actions">
         <button class="mact" onclick="closeNewAth()">Cancelar</button>
-        <button class="mact primary" onclick="createAthlete()">Crear atleta →</button>
+        <button class="mact primary" id="na-submit-btn" onclick="createAthlete()">Crear atleta →</button>
       </div>
+      <div id="na-error" style="display:none;color:var(--danger);font-size:.72rem;margin-top:8px;line-height:1.45;text-align:center;padding:0 4px;"></div>
     </div>
     <!-- Link result -->
     <div id="new-ath-result" style="display:none;padding:20px 24px;">
@@ -1345,6 +1346,9 @@ function openNewAth(){
   ['na-name','na-age','na-weight','na-height','na-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   customHabitDefs=[];
   custPickedEmoji='🎯';
+  hideNaError();
+  const btn=document.getElementById('na-submit-btn');
+  if(btn){btn.disabled=false;btn.textContent='Crear atleta →';}
   const panel=document.getElementById('cust-hab-panel');
   if(panel)panel.classList.remove('open');
   const egrd=document.getElementById('emoji-grd');
@@ -1397,6 +1401,12 @@ function addCustomHabit(){
 async function createAthlete(){
   const name=document.getElementById('na-name').value.trim();
   if(!name){toast('Escribe el nombre del atleta');return;}
+
+  if(!SUPA_CONFIGURED){
+    showNaError('Conecta Supabase para crear atletas reales.');
+    return;
+  }
+
   const tag=document.getElementById('na-tag').value;
   const age=parseInt(document.getElementById('na-age').value)||null;
   const weight=parseFloat(document.getElementById('na-weight').value)||null;
@@ -1407,7 +1417,6 @@ async function createAthlete(){
   const colors=['#974315','#788990','#8D957E','#b0795a','#6b8c6b','#c4956a'];
   const color=colors[Math.floor(Math.random()*colors.length)];
 
-  // Build habits: standard selected + all custom
   const stdHabs=[...selectedHabits].map((hid,i)=>{
     const h=ALL_HABITS.find(x=>x.id===hid);
     return h?{name:h.name,icon:h.icon,color:h.color,type:h.type,goal:h.goal||1,position:i}:null;
@@ -1415,9 +1424,19 @@ async function createAthlete(){
   const custHabs=customHabitDefs.map((h,i)=>({name:h.name,icon:h.icon,color:h.color,type:h.type==='scale'?'check':h.type,goal:h.goal||1,position:stdHabs.length+i}));
   const allHabs=[...stdHabs,...custHabs];
 
+  const btn=document.getElementById('na-submit-btn');
+  if(btn){btn.disabled=true;btn.textContent='Guardando...';}
+  hideNaError();
+
   try{
-    const [ath]=await sb.post('athletes',{name,tag,token,coach_id:'coach1',color,profile,coach_notes:coachNotes});
-    if(allHabs.length) await sb.post('habits',allHabs.map(h=>({...h,athlete_id:ath.id})));
+    const res=await sb.post('athletes',{name,tag,token,coach_id:'coach1',color,profile,coach_notes:coachNotes||null});
+    const ath=Array.isArray(res)?res[0]:res;
+    if(!ath||!ath.id) throw new Error('La respuesta de Supabase no contiene un ID válido.');
+
+    if(allHabs.length){
+      await sb.post('habits',allHabs.map(h=>({...h,athlete_id:ath.id})));
+    }
+
     const link=`${BASE_URL}?a=${token}`;
     document.getElementById('nar-name').textContent=name;
     document.getElementById('nar-link').textContent=link;
@@ -1425,13 +1444,18 @@ async function createAthlete(){
     document.getElementById('new-ath-result').style.display='block';
     await loadAndRenderCoach();
   }catch(e){
-    const link=`${BASE_URL}?a=${token}`;
-    document.getElementById('nar-name').textContent=name;
-    document.getElementById('nar-link').textContent=link;
-    document.getElementById('new-ath-form').style.display='none';
-    document.getElementById('new-ath-result').style.display='block';
-    toast('Demo: en producción se guardaría en la base de datos');
+    showNaError('No se pudo crear el atleta. Comprueba tu conexión e inténtalo de nuevo.');
+    if(btn){btn.disabled=false;btn.textContent='Crear atleta →';}
   }
+}
+
+function showNaError(msg){
+  const el=document.getElementById('na-error');
+  if(el){el.textContent=msg;el.style.display='';}
+}
+function hideNaError(){
+  const el=document.getElementById('na-error');
+  if(el)el.style.display='none';
 }
 
 function copyLink(){

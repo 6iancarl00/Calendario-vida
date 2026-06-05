@@ -654,6 +654,11 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 .prof-mood-lbl{font-size:.5rem;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.5px;}
 @media(min-width:820px){.prof-stats{grid-template-columns:repeat(4,1fr);}}
 
+/* Notification permission prompt */
+.notif-prompt{position:fixed;bottom:80px;left:16px;right:16px;background:white;border-radius:16px;padding:20px;box-shadow:0 8px 40px rgba(151,67,21,.18);z-index:60;transform:translateY(120%);transition:transform .3s ease;max-width:480px;margin:0 auto;}
+.notif-prompt.show{transform:translateY(0);}
+@media(min-width:820px){.notif-prompt{left:50%;right:auto;transform:translateX(-50%) translateY(120%);width:440px;bottom:32px;}.notif-prompt.show{transform:translateX(-50%) translateY(0);}}
+
 /* Annual mini-cal event indicator */
 .mini-d.hev{outline:1.5px solid var(--warn);outline-offset:-1.5px;border-radius:3px;}
 .mini-d.hev.hd{outline-color:var(--verde);}
@@ -1057,6 +1062,10 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
         <div class="card-t">😊 Estado de ánimo · últimos 7 días</div>
         <div id="prof-mood-body"></div>
       </div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-t">🔔 Notificaciones</div>
+        <div id="prof-notif-body"></div>
+      </div>
     </div>
   </main>
 </div>
@@ -1070,6 +1079,23 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
   <div class="mn-item" id="mn-annual" onclick="mobileNav('annual')">AÑO</div>
   <div class="mn-item" id="mn-coach" onclick="mobileNav('coach')" style="display:none">PANEL</div>
 </nav>
+
+<!-- NOTIFICATION PROMPT -->
+<div class="notif-prompt" id="notif-prompt">
+  <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;">
+    <div style="font-size:1.7rem;flex-shrink:0;line-height:1;">🔔</div>
+    <div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--terra);margin-bottom:5px;">Activa tu recordatorio diario</div>
+      <div style="font-size:.76rem;color:var(--soft);line-height:1.5;">Te avisamos cada día para que no olvides registrar tus hábitos</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <label style="font-size:.66rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--soft);white-space:nowrap;flex-shrink:0;">Hora</label>
+    <input type="time" id="notif-time-inp" value="21:00" class="form-input" style="flex:1;max-width:140px;">
+  </div>
+  <button onclick="activateReminder()" style="width:100%;background:var(--terra);color:white;border:none;border-radius:10px;padding:13px;font-family:'Jost',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;letter-spacing:.3px;margin-bottom:10px;">Activar recordatorio</button>
+  <div style="text-align:center;"><span onclick="hideNotifPrompt(true)" style="font-size:.74rem;color:var(--soft);cursor:pointer;text-decoration:underline;text-underline-offset:3px;">Ahora no</span></div>
+</div>
 
 <script>
 // ══════════════════════════════════════
@@ -1208,12 +1234,20 @@ async function init(){
       const evs = await sb.get('events','?athlete_id=eq.'+curAthlete.id+'&order=date').catch(()=>[]);
       athEvents = evs;
       hideLoad();
+      // Auto-schedule daily reminder if already set up
+      const _savedTime=localStorage.getItem('reminder_time');
+      if(_savedTime&&'Notification' in window&&Notification.permission==='granted'){
+        scheduleReminder(_savedTime);
+      }
       const onboardingDone = localStorage.getItem('onboarding_done_'+token);
       if(!onboardingDone && athHabits.length > 0){
         showOnboarding(token);
       } else {
         renderAthleteMode();
         showCal('day');
+        if('Notification' in window&&Notification.permission==='default'){
+          setTimeout(()=>showNotifPrompt(),2000);
+        }
       }
     }catch(e){
       console.warn('Supabase error, falling back to demo:', e.message);
@@ -1292,6 +1326,9 @@ function dismissOnboarding(token){
       ob.style.display='none';
       renderAthleteMode();
       showCal('day');
+      if('Notification' in window&&Notification.permission==='default'){
+        setTimeout(()=>showNotifPrompt(),2000);
+      }
     },320);
   } else {
     renderAthleteMode();
@@ -2083,6 +2120,7 @@ function renderProfile(){
   renderProfWeight();
   renderProfHabits();
   renderProfMood();
+  renderNotifSettings();
 }
 
 function renderProfHeader(){
@@ -2643,6 +2681,112 @@ function mobileNav(v){
   if(el) el.classList.add('active');
   showScreen('cal');
   showCal(v);
+}
+
+// ══════════════════════════════════════
+// NOTIFICATIONS
+// ══════════════════════════════════════
+function showNotifPrompt(){
+  if(!curAthlete)return;
+  if(!('Notification' in window))return;
+  if(Notification.permission!=='default')return;
+  if(localStorage.getItem('notif-dismissed'))return;
+  const p=document.getElementById('notif-prompt');
+  if(p)p.classList.add('show');
+}
+
+function hideNotifPrompt(persist){
+  const p=document.getElementById('notif-prompt');
+  if(p)p.classList.remove('show');
+  if(persist)localStorage.setItem('notif-dismissed','1');
+}
+
+async function activateReminder(){
+  if(!('Notification' in window)){toast('Tu navegador no soporta notificaciones');return;}
+  const inp=document.getElementById('notif-time-inp');
+  const timeStr=(inp?inp.value:'')||'21:00';
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    scheduleReminder(timeStr);
+    hideNotifPrompt(false);
+    toast('🔔 Recordatorio activado para las '+timeStr);
+    renderNotifSettings();
+  } else {
+    hideNotifPrompt(true);
+    if(perm==='denied')toast('Activa las notificaciones en los ajustes del navegador');
+  }
+}
+
+function scheduleReminder(timeStr){
+  localStorage.setItem('reminder_time',timeStr);
+  const [h,m]=timeStr.split(':').map(Number);
+  const now=new Date();
+  const next=new Date();
+  next.setHours(h,m,0,0);
+  if(next<=now)next.setDate(next.getDate()+1);
+  const ms=next-now;
+  if(window._reminderTimer)clearTimeout(window._reminderTimer);
+  window._reminderTimer=setTimeout(()=>{
+    if('Notification' in window&&Notification.permission==='granted'){
+      try{
+        new Notification('Calendario Vida 📅',{
+          body:'¿Ya registraste tus hábitos de hoy?',
+          icon:'/icon-192.png',
+          badge:'/icon-192.png',
+          tag:'daily-reminder',
+          renotify:true
+        });
+      }catch(e){console.warn('Notification failed:',e);}
+    }
+    scheduleReminder(timeStr);
+  },ms);
+}
+
+function renderNotifSettings(){
+  const body=document.getElementById('prof-notif-body');
+  if(!body)return;
+  if(!('Notification' in window)){
+    body.innerHTML=`<p style="font-size:.76rem;color:var(--soft);line-height:1.6;margin:0;">Tu navegador no soporta notificaciones — instala la app en tu pantalla de inicio para recibirlas.</p>`;
+    return;
+  }
+  if(Notification.permission==='denied'){
+    body.innerHTML=`<p style="font-size:.76rem;color:var(--danger);line-height:1.6;margin:0;">⚠ Notificaciones bloqueadas — actívalas en los ajustes de tu navegador.</p>`;
+    return;
+  }
+  const saved=localStorage.getItem('reminder_time');
+  const granted=Notification.permission==='granted';
+  if(granted&&saved){
+    body.innerHTML=`
+      <p style="font-size:.8rem;color:var(--verde);font-weight:600;margin:0 0 12px;">🔔 Recordatorio activo — cada día a las ${saved}</p>
+      <div style="display:flex;align-items:center;gap:9px;">
+        <label style="font-size:.66rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--soft);flex-shrink:0;">Hora</label>
+        <input type="time" id="prof-notif-time" value="${saved}" class="form-input" style="flex:1;max-width:130px;">
+        <button onclick="updateReminderTime()" style="padding:8px 14px;background:var(--terra);color:white;border:none;border-radius:7px;font-size:.72rem;font-family:'Jost',sans-serif;font-weight:600;cursor:pointer;white-space:nowrap;">Guardar</button>
+      </div>`;
+  } else {
+    body.innerHTML=`
+      <p style="font-size:.76rem;color:var(--soft);margin:0 0 12px;line-height:1.5;">Activa el recordatorio para recibir una notificación diaria cuando no hayas registrado tus hábitos.</p>
+      <div style="display:flex;align-items:center;gap:9px;">
+        <label style="font-size:.66rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--soft);flex-shrink:0;">Hora</label>
+        <input type="time" id="prof-notif-time" value="21:00" class="form-input" style="flex:1;max-width:130px;">
+        <button onclick="updateReminderTime()" style="padding:8px 14px;background:var(--terra);color:white;border:none;border-radius:7px;font-size:.72rem;font-family:'Jost',sans-serif;font-weight:600;cursor:pointer;white-space:nowrap;">Activar</button>
+      </div>`;
+  }
+}
+
+async function updateReminderTime(){
+  const inp=document.getElementById('prof-notif-time');
+  const timeStr=(inp?inp.value:'')||'21:00';
+  if(!('Notification' in window))return;
+  if(Notification.permission==='granted'){
+    scheduleReminder(timeStr);
+    toast('🔔 Recordatorio: cada día a las '+timeStr);
+    renderNotifSettings();
+  } else {
+    const perm=await Notification.requestPermission();
+    if(perm==='granted'){scheduleReminder(timeStr);toast('🔔 Recordatorio activado: '+timeStr);renderNotifSettings();}
+    else{toast('Activa las notificaciones en los ajustes del navegador');}
+  }
 }
 
 init();

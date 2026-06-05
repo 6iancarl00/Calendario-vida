@@ -687,9 +687,9 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
         <button class="ev-add-btn" id="m-ev-add-btn" style="display:none" onclick="toggleEvForm()">＋ Añadir evento</button>
         <div class="ev-form" id="ev-form">
           <div class="form-group" style="margin:0"><label>Título del evento</label><input class="form-input" id="ev-title" type="text" placeholder="Ej: Pesaje semanal, Revisión..."></div>
-          <div class="ev-date-row">
-            <div class="form-group"><label>Fecha</label><input class="form-input" id="ev-date" type="date"></div>
-            <div class="form-group"><label>Hora (opcional)</label><input class="form-input" id="ev-time" type="time"></div>
+          <div style="display:flex;flex-direction:column;gap:9px;width:100%;">
+            <div class="form-group" style="margin:0"><label>Fecha</label><input class="form-input" id="ev-date" type="date"></div>
+            <div class="form-group" style="margin:0"><label>Hora (opcional)</label><input class="form-input" id="ev-time" type="time"></div>
           </div>
           <div class="form-group" style="margin:0"><label>Tipo</label><div class="ev-type-row" id="ev-type-row"></div></div>
           <div class="form-group" style="margin:0"><label>Notas (opcional)</label><textarea class="form-textarea" id="ev-notes-field" placeholder="Observaciones para el atleta..." rows="2"></textarea></div>
@@ -1652,13 +1652,35 @@ function renderHabsDay(){
     const row=document.createElement('div');
     const val=getLogVal(k,h.id);
     if(h.type==='water'){
-      row.className='water-row hab-row';
-      const glasses=Array.from({length:h.goal||8},(_,i)=>{const f=val>i;return `<div class="water-g ${f?'on':''}" onclick="togWater('${h.id}','${k}',${i},${h.goal||8})">${f?'💧':''}</div>`;}).join('');
-      row.innerHTML=`<div class="h-ic">${h.icon||'💧'}</div><div class="h-name">${h.name}</div><div class="water-gs">${glasses}</div>`;
+      const glasses=Array.from({length:h.goal||8},(_,i)=>{
+        const f=val>i;
+        return `<div onclick="togWater('${h.id}','${k}',${i},${h.goal||8})"
+          style="width:32px;height:32px;border-radius:6px;border:2px solid ${f?'#788990':'#E3D6C5'};
+          background:${f?'#788990':'white'};display:flex;align-items:center;justify-content:center;
+          font-size:.8rem;cursor:pointer;flex-shrink:0;">${f?'💧':''}</div>`;
+      }).join('');
+      row.innerHTML=`
+        <div style="display:flex;flex-direction:column;width:100%;padding:6px 0;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1.1rem;width:28px;text-align:center;flex-shrink:0;">${h.icon||'💧'}</span>
+            <span style="flex:1;font-size:.85rem;font-weight:500;color:#5c4a3a;">${h.name}</span>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;padding-left:38px;">${glasses}</div>
+        </div>`;
     }else{
-      row.className='hab-row';
-      const checks=Array.from({length:h.goal||1},(_,i)=>{const c=val>i;return `<div class="h-check ${c?'on':''}" onclick="togHab('${h.id}','${k}',${i},${h.goal||1})" style="${c?'background:'+h.color+';border-color:'+h.color:''}">${c?'✓':''}</div>`;}).join('');
-      row.innerHTML=`<div class="h-ic">${h.icon||'•'}</div><div class="h-name">${h.name}</div><div class="h-track">${checks}</div>`;
+      const checks=Array.from({length:h.goal||1},(_,i)=>{
+        const c=val>i;
+        return `<div onclick="togHab('${h.id}','${k}',${i},${h.goal||1})"
+          style="width:32px;height:32px;border-radius:50%;border:2px solid ${c?h.color:'#E3D6C5'};
+          background:${c?h.color:'white'};display:flex;align-items:center;justify-content:center;
+          font-size:.75rem;color:${c?'white':'transparent'};cursor:pointer;flex-shrink:0;">${c?'✓':''}</div>`;
+      }).join('');
+      row.innerHTML=`
+        <div style="display:flex;align-items:center;width:100%;gap:10px;padding:6px 0;">
+          <span style="font-size:1.1rem;width:28px;text-align:center;flex-shrink:0;">${h.icon||'•'}</span>
+          <span style="flex:1;font-size:.85rem;font-weight:500;color:#5c4a3a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${h.name}</span>
+          <div style="display:flex;gap:5px;flex-shrink:0;">${checks}</div>
+        </div>`;
     }
     list.appendChild(row);
   });

@@ -606,6 +606,23 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 .ev-date-row{display:flex;gap:8px;}
 .ev-date-row .form-group{flex:1;margin:0;}
 
+/* Coach message card — athlete day view */
+.coach-msg-card{background:white;border-radius:var(--r);padding:17px 19px;box-shadow:var(--shadow);border-left:4px solid #974315;animation:msgIn .4s ease both;}
+@keyframes msgIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.cmc-header{font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#974315;margin-bottom:8px;}
+.cmc-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:var(--text);line-height:1.6;white-space:pre-wrap;word-break:break-word;}
+.cmc-footer{font-size:.62rem;color:var(--soft);text-align:right;margin-top:9px;}
+
+/* Modal message section */
+.m-msg-area{width:100%;min-height:80px;border:1.5px solid var(--bege);border-radius:8px;padding:10px 12px;font-family:'Jost',sans-serif;font-size:.82rem;color:var(--text);background:var(--perola);outline:none;resize:vertical;transition:border-color .15s;line-height:1.6;box-sizing:border-box;}
+.m-msg-area:focus{border-color:var(--terra);background:white;}
+.m-msg-area::placeholder{color:var(--soft);}
+.m-msg-prev{background:var(--perola);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.76rem;color:var(--mid);line-height:1.5;border-left:3px solid #974315;}
+.m-msg-prev-lbl{font-size:.58rem;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-weight:600;}
+.m-msg-send{padding:9px 18px;background:var(--terra);color:white;border:none;border-radius:8px;font-size:.76rem;font-family:'Jost',sans-serif;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:9px;}
+.m-msg-send:hover{opacity:.88;}
+.m-msg-ok{font-size:.76rem;color:var(--verde);font-weight:600;margin-top:8px;display:none;}
+
 /* Annual mini-cal event indicator */
 .mini-d.hev{outline:1.5px solid var(--warn);outline-offset:-1.5px;border-radius:3px;}
 .mini-d.hev.hd{outline-color:var(--verde);}
@@ -769,6 +786,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
       <div class="m-tabs">
         <button class="m-tab active" onclick="switchModalTab(this,'habs')">Hábitos</button>
         <button class="m-tab" onclick="switchModalTab(this,'events')">Eventos</button>
+        <button class="m-tab" onclick="switchModalTab(this,'message')">Mensaje</button>
       </div>
       <div id="m-tab-habs">
         <div class="modal-sec">Hábitos · Semana actual</div>
@@ -789,6 +807,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
           <button class="ev-save-btn" onclick="saveEvent()">Guardar evento</button>
         </div>
       </div>
+      <div id="m-tab-message" style="display:none;padding-top:4px"></div>
       <div class="modal-actions">
         <button class="mact" onclick="closeModal()">✕ Cerrar</button>
         <button class="mact primary" onclick="viewAthCal()">📅 Ver su calendario</button>
@@ -960,6 +979,7 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
             <div class="day-main">
               <div><div class="day-dr"><div><div class="day-big" id="d-date">—</div><div class="day-wd" id="d-wd">—</div></div><div class="nav-row"><button class="nav-btn" onclick="chgDay(-1)">‹</button><button class="today-btn" onclick="goToday()">Hoy</button><button class="nav-btn" onclick="chgDay(1)">›</button></div></div></div>
               <div class="day-quick-strip" id="day-quick-strip"></div>
+              <div id="coach-msg-card"></div>
               <div id="day-events-card" style="display:none"></div>
               <div class="card"><div class="card-t">✦ Intención del día</div><textarea class="int-area" id="intention" placeholder="¿Con qué intención quieres vivir este día?..." rows="2" onblur="saveNote()"></textarea></div>
               <div class="card"><div class="card-t">Objetivos de hoy</div><div id="habs-cont"></div></div>
@@ -1496,12 +1516,15 @@ function openModal(a){
   // Populate type buttons
   const typeRow=document.getElementById('ev-type-row');
   if(typeRow)typeRow.innerHTML=Object.entries(EV_TYPES).map(([k,v])=>`<button class="ev-type-btn${k===evSelectedType?' sel':''}" onclick="selEvType(this,'${k}')">${v.icon} ${v.label}</button>`).join('');
+  // Message tab
+  renderMessageSection(a);
   // Reset to habs tab
   document.querySelectorAll('.m-tab').forEach(t=>t.classList.remove('active'));
   const firstTab=document.querySelector('.m-tab');
   if(firstTab)firstTab.classList.add('active');
   document.getElementById('m-tab-habs').style.display='';
   document.getElementById('m-tab-events').style.display='none';
+  document.getElementById('m-tab-message').style.display='none';
   // Default date for event form
   const evDateEl=document.getElementById('ev-date');
   if(evDateEl&&!evDateEl.value)evDateEl.value=dk(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
@@ -1799,7 +1822,7 @@ function renderDay(){
   document.getElementById('notes').value=note.notes||'';
   document.getElementById('sl-sl').value=note.sleep||7;
   document.getElementById('sl-val').textContent=(note.sleep||7)+'h';
-  renderHabsDay();renderWeekStrip();renderMood(note.mood);renderChart();renderWeightCard();renderStreakCard();renderDayEvents();renderNextEvents();renderQuickStrip();
+  renderHabsDay();renderWeekStrip();renderMood(note.mood);renderChart();renderWeightCard();renderStreakCard();renderDayEvents();renderNextEvents();renderQuickStrip();renderCoachMsg();
 }
 
 function renderHabsDay(){
@@ -1987,6 +2010,67 @@ function renderChart(){
 }
 
 // ══════════════════════════════════════
+// COACH MESSAGE
+// ══════════════════════════════════════
+function renderCoachMsg(){
+  const card=document.getElementById('coach-msg-card');
+  if(!card)return;
+  const msg=curAthlete&&curAthlete.coach_message;
+  if(!msg){card.innerHTML='';return;}
+  const todayStr=dk(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
+  const yestStr=dk(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()-1);
+  const msgDate=curAthlete.coach_message_date;
+  if(msgDate&&msgDate!==todayStr&&msgDate!==yestStr){card.innerHTML='';return;}
+  const dateLabel=(!msgDate||msgDate===todayStr)?'Hoy':new Date(msgDate+'T12:00:00').getDate()+' '+MONTHS[new Date(msgDate+'T12:00:00').getMonth()].slice(0,3);
+  card.innerHTML=`<div class="coach-msg-card">
+    <div class="cmc-header">💬 Mensaje de tu entrenador</div>
+    <div class="cmc-text">${msg.replace(/</g,'&lt;')}</div>
+    <div class="cmc-footer">${dateLabel}</div>
+  </div>`;
+}
+
+function renderMessageSection(a){
+  const tab=document.getElementById('m-tab-message');
+  if(!tab)return;
+  const existing=(a.coach_message||'').trim();
+  const sentDate=a.coach_message_date?
+    (a.coach_message_date===dk(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate())?'Hoy':
+     new Date(a.coach_message_date+'T12:00:00').getDate()+' '+MONTHS[new Date(a.coach_message_date+'T12:00:00').getMonth()].slice(0,3))
+    :'';
+  const prevHtml=existing?`<div class="m-msg-prev"><div class="m-msg-prev-lbl">Mensaje actual · ${sentDate}</div>${existing.replace(/</g,'&lt;')}</div>`:'';
+  const btnLabel=existing?'Actualizar mensaje':'Enviar mensaje';
+  const aid=String(a.id).replace(/'/g,"\\'");
+  tab.innerHTML=`${prevHtml}
+    <div class="form-group" style="margin:0">
+      <label>${existing?'Actualizar mensaje para hoy':'Escribir mensaje al atleta'}</label>
+      <textarea class="m-msg-area" id="m-msg-ta" placeholder="Escribe un mensaje o nota... aparecerá en su calendario hoy" rows="4">${existing}</textarea>
+    </div>
+    <button class="m-msg-send" onclick="saveCoachMessage('${aid}')">${btnLabel}</button>
+    <div class="m-msg-ok" id="m-msg-ok">✓ Mensaje enviado</div>`;
+}
+
+async function saveCoachMessage(athId){
+  const ta=document.getElementById('m-msg-ta');
+  const msg=(ta?ta.value:'').trim();
+  const todayStr=dk(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
+  const a=allAthletes.find(x=>String(x.id)===String(athId));
+  try{
+    await sb.patch('athletes',{coach_message:msg||null,coach_message_date:todayStr},'?id=eq.'+athId);
+    if(a){a.coach_message=msg||null;a.coach_message_date=todayStr;}
+    // Also update curAthlete if viewing this athlete's calendar
+    if(viewingAth&&String(viewingAth.id)===String(athId)){
+      viewingAth.coach_message=msg||null;
+      viewingAth.coach_message_date=todayStr;
+    }
+    const okEl=document.getElementById('m-msg-ok');
+    if(okEl){okEl.style.display='block';setTimeout(()=>{okEl.style.display='none';},2000);}
+    if(a)renderMessageSection(a);
+  }catch(e){
+    toast('Error al enviar el mensaje');
+  }
+}
+
+// ══════════════════════════════════════
 // MOBILE QUICK STRIP
 // ══════════════════════════════════════
 function renderQuickStrip(){
@@ -2074,6 +2158,7 @@ function switchModalTab(el,tab){
   el.classList.add('active');
   document.getElementById('m-tab-habs').style.display=tab==='habs'?'':'none';
   document.getElementById('m-tab-events').style.display=tab==='events'?'':'none';
+  document.getElementById('m-tab-message').style.display=tab==='message'?'':'none';
 }
 
 function toggleEvForm(){

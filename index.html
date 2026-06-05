@@ -609,6 +609,45 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 /* Annual mini-cal event indicator */
 .mini-d.hev{outline:1.5px solid var(--warn);outline-offset:-1.5px;border-radius:3px;}
 .mini-d.hev.hd{outline-color:var(--verde);}
+
+/* ── ONBOARDING ── */
+#onboarding{
+  position:fixed;inset:0;background:var(--perola);z-index:150;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 0 100px; /* space for fixed CTA */
+  transition:opacity .3s;
+}
+#onboarding.hide{opacity:0;pointer-events:none;}
+.ob-inner{width:100%;max-width:480px;padding:0 20px;animation:obIn .4s ease both;}
+@keyframes obIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.ob-logo{text-align:center;padding:32px 0 24px;}
+.ob-logo-t{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;letter-spacing:3px;color:var(--terra);text-transform:uppercase;}
+.ob-logo-t strong{font-style:italic;font-weight:600;}
+.ob-greeting{text-align:center;margin-bottom:28px;padding:0 8px;}
+.ob-name{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--terra);line-height:1.1;margin-bottom:10px;}
+.ob-sub{font-size:.88rem;color:var(--soft);line-height:1.6;font-family:'Jost',sans-serif;}
+.ob-section{margin-bottom:24px;}
+.ob-sec-title{font-size:.62rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--soft);margin-bottom:10px;padding-left:2px;}
+.ob-hab-card{background:white;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:13px;margin-bottom:8px;box-shadow:0 2px 12px rgba(151,67,21,.07);}
+.ob-hab-icon{font-size:1.35rem;width:36px;text-align:center;flex-shrink:0;}
+.ob-hab-name{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:2px;}
+.ob-hab-desc{font-size:.72rem;color:var(--soft);line-height:1.4;}
+.ob-steps{display:flex;flex-direction:column;gap:10px;}
+.ob-step{background:white;border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:13px;box-shadow:0 2px 12px rgba(151,67,21,.07);}
+.ob-step-num{width:28px;height:28px;border-radius:50%;background:var(--terra);color:white;font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.ob-step-title{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:3px;}
+.ob-step-desc{font-size:.74rem;color:var(--soft);line-height:1.4;}
+.ob-install-card{background:var(--terra);border-radius:14px;padding:20px 18px;margin-bottom:24px;display:flex;align-items:flex-start;gap:14px;}
+.ob-install-ic{font-size:1.8rem;flex-shrink:0;}
+.ob-install-body{flex:1;}
+.ob-install-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:300;color:white;margin-bottom:6px;line-height:1.3;}
+.ob-install-sub{font-size:.74rem;color:rgba(240,237,228,.65);margin-bottom:12px;line-height:1.4;}
+.ob-install-btn{background:white;color:var(--terra);border:none;border-radius:8px;padding:9px 18px;font-size:.76rem;font-weight:700;font-family:'Jost',sans-serif;cursor:pointer;transition:opacity .15s;}
+.ob-install-btn:hover{opacity:.9;}
+.ob-cta-wrap{position:fixed;bottom:0;left:0;right:0;padding:14px 20px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--perola) 70%,transparent);z-index:10;}
+.ob-cta{display:block;width:100%;max-width:440px;margin:0 auto;background:var(--terra);color:white;border:none;border-radius:12px;padding:17px 24px;font-family:'Jost',sans-serif;font-size:1rem;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:opacity .15s;box-shadow:0 4px 20px rgba(151,67,21,.28);}
+.ob-cta:hover{opacity:.9;}
 </style>
 </head>
 <body>
@@ -628,6 +667,60 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
     if(typeof showCal === 'function') showCal('day');
   }, 1000);
 </script>
+
+<!-- ONBOARDING -->
+<div id="onboarding" style="display:none">
+  <div class="ob-inner">
+    <div class="ob-logo">
+      <div class="ob-logo-t">Calen<strong>dario</strong> Vida</div>
+    </div>
+    <div class="ob-greeting">
+      <div class="ob-name" id="ob-name">Hola 👋</div>
+      <div class="ob-sub">Tu entrenador ha preparado este espacio para ti.<br>Aquí registrarás tus hábitos y verás tu progreso día a día.</div>
+    </div>
+    <div class="ob-section">
+      <div class="ob-sec-title">Tus objetivos diarios</div>
+      <div id="ob-habs"></div>
+    </div>
+    <div class="ob-section">
+      <div class="ob-sec-title">Cómo funciona</div>
+      <div class="ob-steps">
+        <div class="ob-step">
+          <div class="ob-step-num">1</div>
+          <div>
+            <div class="ob-step-title">📅 Abre la app cada día</div>
+            <div class="ob-step-desc">Registra tus hábitos y cómo te sientes. Solo tarda un minuto.</div>
+          </div>
+        </div>
+        <div class="ob-step">
+          <div class="ob-step-num">2</div>
+          <div>
+            <div class="ob-step-title">✅ Marca tus objetivos</div>
+            <div class="ob-step-desc">Tu entrenador los ha configurado específicamente para ti.</div>
+          </div>
+        </div>
+        <div class="ob-step">
+          <div class="ob-step-num">3</div>
+          <div>
+            <div class="ob-step-title">📈 Ve tu progreso</div>
+            <div class="ob-step-desc">Semana a semana verás tu evolución y rachas de constancia.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ob-install-card" id="ob-install-card">
+      <div class="ob-install-ic">📲</div>
+      <div class="ob-install-body">
+        <div class="ob-install-title">Añade esta app a tu pantalla de inicio</div>
+        <div class="ob-install-sub">Accede con un toque cada día, sin buscar el enlace.</div>
+        <button class="ob-install-btn" id="ob-install-btn">Instalar app</button>
+      </div>
+    </div>
+  </div>
+  <div class="ob-cta-wrap">
+    <button class="ob-cta" id="ob-cta">Empezar mi seguimiento →</button>
+  </div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -1045,8 +1138,13 @@ async function init(){
       const evs = await sb.get('events','?athlete_id=eq.'+curAthlete.id+'&order=date').catch(()=>[]);
       athEvents = evs;
       hideLoad();
-      renderAthleteMode();
-      showCal('day');
+      const onboardingDone = localStorage.getItem('onboarding_done_'+token);
+      if(!onboardingDone && athHabits.length > 0){
+        showOnboarding(token);
+      } else {
+        renderAthleteMode();
+        showCal('day');
+      }
     }catch(e){
       console.warn('Supabase error, falling back to demo:', e.message);
       hideLoad();
@@ -1063,6 +1161,72 @@ async function init(){
 
 function showError(msg){
   document.getElementById('main').innerHTML=`<div style="text-align:center;padding:60px 20px;"><div style="font-size:2rem;margin-bottom:12px">⚠️</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--terra);margin-bottom:8px">Algo salió mal</div><div style="font-size:.82rem;color:var(--soft)">${msg}</div></div>`;
+}
+
+// ══════════════════════════════════════
+// ONBOARDING
+// ══════════════════════════════════════
+const HAB_DESCS={
+  water:'Registra cuántos vasos de agua bebes cada día',
+  check:'Marca si lo hiciste hoy',
+  sleep:'Anota tus horas de sueño',
+};
+
+function showOnboarding(token){
+  const ob=document.getElementById('onboarding');
+  if(!ob)return;
+
+  // Personalise greeting
+  const firstName=curAthlete?curAthlete.name.split(' ')[0]:'';
+  document.getElementById('ob-name').textContent=`Hola, ${firstName} 👋`;
+
+  // Render habit list
+  const habsEl=document.getElementById('ob-habs');
+  habsEl.innerHTML=athHabits.filter(h=>h.type!=='sleep').map(h=>`
+    <div class="ob-hab-card" style="border-left:4px solid ${h.color||'var(--terra)'};">
+      <div class="ob-hab-icon">${h.icon||'•'}</div>
+      <div>
+        <div class="ob-hab-name">${h.name}</div>
+        <div class="ob-hab-desc">${HAB_DESCS[h.type]||HAB_DESCS.check}</div>
+      </div>
+    </div>`).join('');
+
+  // Install button
+  const installBtn=document.getElementById('ob-install-btn');
+  const installCard=document.getElementById('ob-install-card');
+  if(installBtn){
+    // Show card only if install is possible or always show the tip
+    installBtn.addEventListener('click',()=>{
+      if(deferredPrompt){
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(()=>{installCard.style.display='none';});
+      } else {
+        toast('Menú del navegador → "Añadir a pantalla de inicio"');
+      }
+    });
+  }
+
+  // CTA dismiss
+  const cta=document.getElementById('ob-cta');
+  if(cta) cta.addEventListener('click',()=>dismissOnboarding(token));
+
+  ob.style.display='flex';
+}
+
+function dismissOnboarding(token){
+  localStorage.setItem('onboarding_done_'+token,'1');
+  const ob=document.getElementById('onboarding');
+  if(ob){
+    ob.classList.add('hide');
+    setTimeout(()=>{
+      ob.style.display='none';
+      renderAthleteMode();
+      showCal('day');
+    },320);
+  } else {
+    renderAthleteMode();
+    showCal('day');
+  }
 }
 
 // ══════════════════════════════════════

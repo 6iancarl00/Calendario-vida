@@ -623,6 +623,37 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
 .m-msg-send:hover{opacity:.88;}
 .m-msg-ok{font-size:.76rem;color:var(--verde);font-weight:600;margin-top:8px;display:none;}
 
+/* ── PROFILE SCREEN ── */
+.prof-back{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:500;letter-spacing:.5px;color:var(--soft);cursor:pointer;padding:6px 0;margin-bottom:16px;transition:color .15s;}
+.prof-back:hover{color:var(--terra);}
+.prof-av{width:54px;height:54px;border-radius:50%;background:var(--terra);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:white;flex-shrink:0;}
+.prof-name{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--terra);line-height:1.1;}
+.prof-tag{font-size:.64rem;font-weight:600;letter-spacing:.8px;color:var(--soft);background:var(--perola);border-radius:10px;padding:2px 8px;display:inline-block;margin-top:5px;text-transform:uppercase;}
+.prof-days{font-size:.66rem;color:var(--soft);margin-top:5px;}
+.prof-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.prof-stat{background:white;border-radius:var(--r);padding:15px 16px;box-shadow:var(--shadow);}
+.prof-stat-ic{font-size:1.2rem;margin-bottom:5px;}
+.prof-stat-val{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--terra);line-height:1;}
+.prof-stat-lbl{font-size:.6rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--soft);margin-top:4px;}
+.prof-weight-main{display:flex;align-items:baseline;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
+.prof-weight-num{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--terra);line-height:1;}
+.prof-weight-unit{font-size:.92rem;color:var(--soft);}
+.prof-weight-diff{font-size:.78rem;font-weight:600;padding:2px 8px;border-radius:10px;}
+.prof-weight-nodata{text-align:center;padding:28px 14px;font-size:.78rem;color:var(--soft);line-height:1.7;}
+.prof-hab-row{display:flex;align-items:center;gap:9px;margin-bottom:11px;}
+.prof-hab-row:last-child{margin-bottom:0;}
+.prof-hab-ic{font-size:.88rem;width:22px;text-align:center;flex-shrink:0;}
+.prof-hab-name{font-size:.74rem;font-weight:500;color:var(--mid);width:85px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.prof-hab-bar-wrap{flex:1;height:6px;border-radius:3px;background:var(--bege);overflow:hidden;}
+.prof-hab-bar{height:100%;border-radius:3px;}
+.prof-hab-pct{font-size:.68rem;font-weight:700;color:var(--terra);width:30px;text-align:right;flex-shrink:0;}
+.prof-mood-row{display:flex;justify-content:space-between;gap:3px;}
+.prof-mood-day{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;}
+.prof-mood-circle{width:38px;height:38px;border-radius:50%;background:var(--perola-dark);display:flex;align-items:center;justify-content:center;font-size:1.15rem;}
+.prof-mood-circle.has-mood{background:var(--perola);}
+.prof-mood-lbl{font-size:.5rem;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.5px;}
+@media(min-width:820px){.prof-stats{grid-template-columns:repeat(4,1fr);}}
+
 /* Annual mini-cal event indicator */
 .mini-d.hev{outline:1.5px solid var(--warn);outline-offset:-1.5px;border-radius:3px;}
 .mini-d.hev.hd{outline-color:var(--verde);}
@@ -1008,6 +1039,25 @@ body{font-family:'Jost',sans-serif;background:var(--perola);color:var(--text);mi
         <div class="side-ps"><div class="panel"><div class="p-title">Alertas</div><div id="alerts-l"></div></div><div class="panel"><div class="p-title">Hábitos del grupo</div><div id="hab-rank"></div></div></div>
       </div>
     </div>
+
+    <!-- SCREEN: PROFILE -->
+    <div class="screen" id="screen-profile">
+      <div class="prof-back" onclick="goToCalDay()">← Mi calendario</div>
+      <div id="prof-header-card"></div>
+      <div class="prof-stats" id="prof-stats"></div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-t">⚖️ Evolución del peso</div>
+        <div id="prof-weight-body"></div>
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-t">📊 Mis hábitos esta semana</div>
+        <div id="prof-habs-body"></div>
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-t">😊 Estado de ánimo · últimos 7 días</div>
+        <div id="prof-mood-body"></div>
+      </div>
+    </div>
   </main>
 </div>
 <div class="coach-hint" id="coach-hint" onclick="openPIN()" title="Acceso entrenador">🏋️</div>
@@ -1336,7 +1386,7 @@ function renderSBAth(){
     <div class="nav-i" onclick="showCal('weekly')"><span class="ic">🗓</span> Semanal</div>
     <div class="nav-i" onclick="showCal('annual')"><span class="ic">🗂</span> Anual</div>
     <div class="sb-sec" style="margin-top:10px">Mi progreso</div>
-    <div class="nav-i"><span class="ic">📈</span> Estadísticas</div>`;
+    <div class="nav-i" onclick="showProfile()"><span class="ic">📈</span> Estadísticas</div>`;
 }
 function renderSBCoach(){
   const ac=allAthletes.filter(a=>lastAct(a._wd)<40||lastAct2(a._wd)>=3).length;
@@ -2007,6 +2057,236 @@ function renderChart(){
     ctx.fillText(day.label,gx+groupW/2,H-5);
   });
   document.getElementById('chart-leg').innerHTML=habs.map(h=>`<div class="cl-i"><div class="cl-d" style="background:${h.color}"></div>${h.name}</div>`).join('');
+}
+
+// ══════════════════════════════════════
+// PROFILE SCREEN
+// ══════════════════════════════════════
+function goToCalDay(){
+  showScreen('cal');showCal('day');
+  document.querySelectorAll('.nav-i').forEach(el=>el.classList.remove('active'));
+  const first=document.querySelector('#sb-nav .nav-i');
+  if(first)first.classList.add('active');
+}
+
+function showProfile(){
+  showScreen('profile');
+  document.querySelectorAll('.nav-i').forEach(el=>el.classList.remove('active'));
+  const statsItem=Array.from(document.querySelectorAll('.nav-i')).find(el=>el.textContent.includes('Estadísticas'));
+  if(statsItem)statsItem.classList.add('active');
+  renderProfile();
+}
+
+function renderProfile(){
+  renderProfHeader();
+  renderProfStats();
+  renderProfWeight();
+  renderProfHabits();
+  renderProfMood();
+}
+
+function renderProfHeader(){
+  const a=curAthlete;
+  const name=a?a.name:'Tu perfil';
+  const tag=a?a.tag:'';
+  const days=a&&a.created_at?Math.floor((Date.now()-new Date(a.created_at))/(864e5)):
+    Object.keys(athLogs).filter(k=>Object.values(athLogs[k]).some(v=>v>0)).length;
+  const inits=a?a.name.split(' ').map(w=>w[0]).join('').slice(0,2):'TU';
+
+  // Current week adherence ring
+  const habs=getHabs().filter(h=>h.type!=='sleep');
+  const ws=getWS(cur.year,cur.month,cur.day);
+  const wDays=Array.from({length:7},(_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);return d;});
+  let tP=0,tD=0;
+  wDays.forEach(d=>{
+    const k=dk(d.getFullYear(),d.getMonth(),d.getDate());
+    habs.forEach(h=>{const mx=h.goal||1;tP+=mx;tD+=Math.min(getLogVal(k,h.id),mx);});
+  });
+  const pct=tP>0?Math.round(tD/tP*100):0;
+  const rc=pct>=70?'#8D957E':pct>=40?'#c4783a':'#b84040';
+  const circ=(2*Math.PI*24).toFixed(1);
+  const off=(parseFloat(circ)-(pct/100)*parseFloat(circ)).toFixed(1);
+
+  document.getElementById('prof-header-card').innerHTML=`
+    <div class="card" style="margin-bottom:12px;display:flex;align-items:center;gap:16px;">
+      <div class="prof-av">${inits}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="prof-name">${name}</div>
+        ${tag?`<div class="prof-tag">${tag}</div>`:''}
+        <div class="prof-days">${days} días con tu entrenador</div>
+      </div>
+      <div style="position:relative;width:60px;height:60px;flex-shrink:0;">
+        <svg width="60" height="60" viewBox="0 0 60 60" style="transform:rotate(-90deg)">
+          <circle fill="none" stroke="var(--perola)" stroke-width="5" cx="30" cy="30" r="24"/>
+          <circle fill="none" stroke="${rc}" stroke-width="5" stroke-linecap="round"
+            cx="30" cy="30" r="24" stroke-dasharray="${circ}" stroke-dashoffset="${off}"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <span style="font-size:.72rem;font-weight:700;color:var(--text);line-height:1;">${pct}%</span>
+          <span style="font-size:.46rem;color:var(--soft);text-transform:uppercase;letter-spacing:.5px;">semana</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderProfStats(){
+  const streak=calcStreak();
+  const totalDays=Object.keys(athLogs).filter(k=>Object.values(athLogs[k]).some(v=>v>0)).length;
+
+  // Best week within loaded data
+  const habs=getHabs().filter(h=>h.type!=='sleep');
+  const allKeys=Object.keys(athLogs).sort();
+  let bestWeek=0;
+  for(let i=0;i<allKeys.length;i++){
+    const wk=allKeys.slice(i,i+7);
+    let wp=0,wd=0;
+    wk.forEach(k=>{habs.forEach(h=>{const mx=h.goal||1;wp+=mx;wd+=Math.min(getLogVal(k,h.id),mx);});});
+    if(wp>0)bestWeek=Math.max(bestWeek,Math.round(wd/wp*100));
+  }
+
+  // Water average this week
+  const ws=getWS(cur.year,cur.month,cur.day);
+  const wDays=Array.from({length:7},(_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);return d;});
+  const waterH=habs.find(h=>h.type==='water');
+  let wSum=0,wDaysCt=0;
+  if(waterH){
+    wDays.forEach(d=>{
+      const k=dk(d.getFullYear(),d.getMonth(),d.getDate());
+      const v=getLogVal(k,waterH.id);
+      if(v>0){wSum+=v;wDaysCt++;}
+    });
+  }
+  const waterAvg=wDaysCt>0?(wSum/wDaysCt).toFixed(1):'—';
+
+  document.getElementById('prof-stats').innerHTML=`
+    <div class="prof-stat"><div class="prof-stat-ic">🔥</div><div class="prof-stat-val">${streak}</div><div class="prof-stat-lbl">Racha actual</div></div>
+    <div class="prof-stat"><div class="prof-stat-ic">📅</div><div class="prof-stat-val">${totalDays}</div><div class="prof-stat-lbl">Días registrados</div></div>
+    <div class="prof-stat"><div class="prof-stat-ic">⭐</div><div class="prof-stat-val">${bestWeek}%</div><div class="prof-stat-lbl">Mejor semana</div></div>
+    <div class="prof-stat"><div class="prof-stat-ic">💧</div><div class="prof-stat-val">${waterAvg}</div><div class="prof-stat-lbl">Agua media</div></div>`;
+}
+
+function renderProfWeight(){
+  const data=[];
+  for(let i=29;i>=0;i--){
+    const d=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()-i);
+    const k=dk(d.getFullYear(),d.getMonth(),d.getDate());
+    data.push({k,w:(athNotes[k]&&athNotes[k].weight!=null)?parseFloat(athNotes[k].weight):null});
+  }
+  const pts=data.filter(p=>p.w!==null);
+  const body=document.getElementById('prof-weight-body');
+
+  if(pts.length<2){
+    body.innerHTML=`<div class="prof-weight-nodata">Aún no hay suficientes datos.<br>Registra tu peso diariamente para ver tu evolución.</div>`;
+    return;
+  }
+
+  const latest=pts[pts.length-1].w;
+  const first=pts[0].w;
+  const diff=latest-first;
+  const diffSign=diff<=0?'−':'+';
+  const diffAbs=Math.abs(diff).toFixed(1);
+  const diffColor=diff<=0?'var(--verde)':'var(--danger)';
+  const diffBg=diff<=0?'rgba(141,149,126,.12)':'rgba(184,64,64,.08)';
+
+  body.innerHTML=`
+    <div class="prof-weight-main">
+      <span class="prof-weight-num">${latest.toFixed(1)}</span>
+      <span class="prof-weight-unit">kg</span>
+      <span class="prof-weight-diff" style="color:${diffColor};background:${diffBg};">${diffSign}${diffAbs} kg desde el inicio</span>
+    </div>
+    <canvas id="prof-wt-canvas" style="width:100%;display:block;" height="120"></canvas>`;
+
+  requestAnimationFrame(()=>{
+    const cv=document.getElementById('prof-wt-canvas');
+    if(cv)drawProfWeightChart(cv,data);
+  });
+}
+
+function drawProfWeightChart(canvas,data){
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.offsetWidth||300;
+  const H=120;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
+
+  const pts=data.map((p,i)=>({i,w:p.w})).filter(p=>p.w!==null);
+  if(pts.length<2)return;
+  const vals=pts.map(p=>p.w);
+  const mn=Math.min(...vals),mx=Math.max(...vals),range=mx-mn||1;
+  const PAD={l:6,r:6,t:14,b:6};
+  const cW=W-PAD.l-PAD.r,cH=H-PAD.t-PAD.b;
+  const total=data.length;
+  const toX=i=>PAD.l+(i/(total-1))*cW;
+  const toY=w=>PAD.t+cH-((w-mn)/range)*cH;
+
+  // Fill under curve
+  ctx.beginPath();
+  pts.forEach((p,pi)=>{const x=toX(p.i),y=toY(p.w);pi===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.lineTo(toX(pts[pts.length-1].i),PAD.t+cH);
+  ctx.lineTo(toX(pts[0].i),PAD.t+cH);
+  ctx.closePath();
+  ctx.fillStyle='rgba(151,67,21,0.08)';ctx.fill();
+
+  // Line
+  ctx.beginPath();ctx.strokeStyle='#974315';ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';
+  pts.forEach((p,pi)=>{const x=toX(p.i),y=toY(p.w);pi===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.stroke();
+
+  // Dots + last label
+  pts.forEach((p,pi)=>{
+    ctx.beginPath();ctx.arc(toX(p.i),toY(p.w),pi===pts.length-1?3.5:2.5,0,Math.PI*2);
+    ctx.fillStyle='#974315';ctx.fill();
+  });
+  const last=pts[pts.length-1];
+  ctx.fillStyle='#974315';ctx.font=`600 9px Jost,sans-serif`;ctx.textAlign='right';
+  ctx.fillText(last.w.toFixed(1)+'kg',Math.min(toX(last.i)+30,W-4),toY(last.w)-7);
+}
+
+function renderProfHabits(){
+  const habs=getHabs().filter(h=>h.type!=='sleep');
+  const ws=getWS(cur.year,cur.month,cur.day);
+  const wDays=Array.from({length:7},(_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);return d;});
+  const body=document.getElementById('prof-habs-body');
+
+  if(!habs.length){
+    body.innerHTML='<div style="font-size:.76rem;color:var(--soft);text-align:center;padding:14px">Sin hábitos configurados</div>';
+    return;
+  }
+
+  const rows=habs.map(h=>{
+    let done=0,total=0;
+    wDays.forEach(d=>{
+      const k=dk(d.getFullYear(),d.getMonth(),d.getDate());
+      const mx=h.goal||1;total+=mx;done+=Math.min(getLogVal(k,h.id),mx);
+    });
+    return {...h,pct:total>0?Math.round(done/total*100):0};
+  }).sort((a,b)=>b.pct-a.pct);
+
+  body.innerHTML=rows.map(h=>`
+    <div class="prof-hab-row">
+      <div class="prof-hab-ic">${h.icon||'•'}</div>
+      <div class="prof-hab-name">${h.name}</div>
+      <div class="prof-hab-bar-wrap"><div class="prof-hab-bar" style="width:${h.pct}%;background:${h.color||'var(--terra)'}"></div></div>
+      <div class="prof-hab-pct">${h.pct}%</div>
+    </div>`).join('');
+}
+
+function renderProfMood(){
+  const DLBL=['L','M','X','J','V','S','D'];
+  const ws=getWS(cur.year,cur.month,cur.day);
+  const wDays=Array.from({length:7},(_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);return d;});
+  document.getElementById('prof-mood-body').innerHTML=`<div class="prof-mood-row">${
+    wDays.map((d,i)=>{
+      const k=dk(d.getFullYear(),d.getMonth(),d.getDate());
+      const mood=athNotes[k]&&athNotes[k].mood;
+      return `<div class="prof-mood-day">
+        <div class="prof-mood-circle${mood?' has-mood':''}">${mood||''}</div>
+        <div class="prof-mood-lbl">${DLBL[i]}</div>
+      </div>`;
+    }).join('')
+  }</div>`;
 }
 
 // ══════════════════════════════════════
